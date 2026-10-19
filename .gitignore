@@ -1,0 +1,29 @@
+# Dataset Images (Excluded to prevent large repository size)
+Train/
+Test/
+*.zip
+
+# PyTorch Checkpoints & Model Weights (Saved locally and on Hugging Face)
+checkpoints/
+*.pth
+*.pt
+*.bin
+*.onnx
+
+# Python & Environment
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+venv/
+env/
+.pytest_cache/
+
+# System & IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.gemini/
+pdf_extracted.txt
