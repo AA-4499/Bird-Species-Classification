@@ -5,7 +5,7 @@
 **Student ID:** 104401283  
 **Institution:** Swinburne University of Technology  
 **Weighting:** 20%  
-**Hugging Face Spaces Application:** [https://huggingface.co/spaces/AndyCHU/cub200-bird-classifier](https://huggingface.co/spaces/AndyCHU/cub200-bird-classifier) *(Replace with your deployed Space URL)*  
+**Hugging Face Spaces Application:** [https://huggingface.co/spaces/AA-49/Bird-Species-Classification](https://huggingface.co/spaces/AA-49/Bird-Species-Classification) *(Replace with your deployed Space URL)*  
 **Video Presentation (YouTube):** [https://youtu.be/placeholder-presentation-link](https://youtu.be/placeholder-presentation-link) *(Attach your recorded presentation link)*
 
 ---

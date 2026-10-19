@@ -5,7 +5,7 @@
 **Student ID:** 104401283  
 **Subject:** COS30082 Applied Machine Learning --- Assignment 1 (20%)  
 **YouTube Presentation Video Link:** [https://youtu.be/placeholder-presentation-link](https://youtu.be/placeholder-presentation-link)  
-**Hugging Face Spaces App Link:** [https://huggingface.co/spaces/AndyCHU/cub200-bird-classifier](https://huggingface.co/spaces/AndyCHU/cub200-bird-classifier)
+**Hugging Face Spaces App Link:** [https://huggingface.co/spaces/AA-49/Bird-Species-Classification](https://huggingface.co/spaces/AA-49/Bird-Species-Classification)
 
 ---
 
