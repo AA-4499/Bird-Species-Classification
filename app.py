@@ -11,6 +11,7 @@ import json
 from PIL import Image
 import torch
 import gradio as gr
+from fastapi import FastAPI
 from torchvision import transforms
 
 from models import build_model
@@ -161,6 +162,11 @@ with gr.Blocks(title="CUB-200 Bird Classifier") as demo:
         **Evaluation Metrics Reported**: Overall Top-1 Accuracy & Average Accuracy per Class across all 200 species.
         """
     )
+
+# Vercel's Python runtime looks for a top-level ASGI/WSGI application. Mount
+# the existing Gradio UI on FastAPI so the same module works on Vercel and
+# keeps the direct Gradio launch below for local/Hugging Face use.
+app = gr.mount_gradio_app(FastAPI(), demo, path="/")
 
 if __name__ == "__main__":
     demo.launch(server_name="0.0.0.0", server_port=7860, share=False)
