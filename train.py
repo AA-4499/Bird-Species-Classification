@@ -114,6 +114,8 @@ def main():
     parser.add_argument("--val_ratio", type=float, default=0.15, help="Validation split proportion (default: 0.15)")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--save_dir", type=str, default="checkpoints", help="Directory to save model weights")
+    parser.add_argument("--resume", type=str, default=None,
+                        help="Path to a checkpoint to resume training from")
     args = parser.parse_args()
 
     set_seed(args.seed)
@@ -158,13 +160,38 @@ def main():
 
     best_val_ave_acc = 0.0
     best_ckpt_path = os.path.join(args.save_dir, f"best_{args.model}.pth")
+    latest_ckpt_path = os.path.join(args.save_dir, f"latest_{args.model}.pth")
+    start_epoch = 1
+
+    if args.resume:
+        print(f"[INFO] Resuming training from {args.resume}")
+        checkpoint = torch.load(args.resume, map_location=device)
+        checkpoint_model = checkpoint.get("model_name", args.model)
+        if checkpoint_model != args.model:
+            raise ValueError(
+                f"Checkpoint model '{checkpoint_model}' does not match requested model '{args.model}'."
+            )
+
+        model.load_state_dict(checkpoint["model_state_dict"])
+        if "optimizer_state_dict" in checkpoint:
+            optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        if "scheduler_state_dict" in checkpoint:
+            scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+        if "scaler_state_dict" in checkpoint:
+            scaler.load_state_dict(checkpoint["scaler_state_dict"])
+
+        start_epoch = checkpoint.get("epoch", 0) + 1
+        best_val_ave_acc = checkpoint.get("best_val_ave_class", checkpoint.get("val_ave_class", 0.0))
+        history = checkpoint.get("history", history)
+        print(f"[INFO] Continuing from epoch {start_epoch} (best Val Ave Class: "
+              f"{best_val_ave_acc*100:.2f}%)")
 
     print(f"\n{'='*70}")
     print(f" Starting Training: {args.model.upper()} | Epochs: {args.epochs} | Batch Size: {args.batch_size}")
     print(f"{'='*70}\n")
 
     start_time = time.time()
-    for epoch in range(1, args.epochs + 1):
+    for epoch in range(start_epoch, args.epochs + 1):
         epoch_start = time.time()
 
         train_loss, train_top1 = train_one_epoch(model, train_loader, criterion, optimizer, scaler, device)
@@ -184,17 +211,30 @@ def main():
               f"Train Loss: {train_loss:.4f}, Top-1: {train_top1*100:.2f}% | "
               f"Val Loss: {val_loss:.4f}, Val Top-1: {val_top1*100:.2f}%, Val Ave Class: {val_ave_acc*100:.2f}%")
 
-        # Save checkpoint if validation average class accuracy improved
-        if val_ave_acc > best_val_ave_acc:
+        improved = val_ave_acc > best_val_ave_acc
+        if improved:
             best_val_ave_acc = val_ave_acc
-            torch.save({
-                "epoch": epoch,
-                "model_name": args.model,
-                "model_state_dict": model.state_dict(),
-                "val_top1": val_top1,
-                "val_ave_class": val_ave_acc,
-                "history": history
-            }, best_ckpt_path)
+
+        checkpoint = {
+            "epoch": epoch,
+            "model_name": args.model,
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "scheduler_state_dict": scheduler.state_dict(),
+            "scaler_state_dict": scaler.state_dict(),
+            "val_top1": val_top1,
+            "val_ave_class": val_ave_acc,
+            "best_val_ave_class": best_val_ave_acc,
+            "history": history
+        }
+
+        # Save the latest state every epoch so interrupted training can resume.
+        torch.save(checkpoint, latest_ckpt_path)
+        print(f"  --> Saved latest checkpoint to {latest_ckpt_path}")
+
+        # Save checkpoint if validation average class accuracy improved
+        if improved:
+            torch.save(checkpoint, best_ckpt_path)
             print(f"  --> Saved new best checkpoint to {best_ckpt_path} (Val Ave Class Acc: {best_val_ave_acc*100:.2f}%)")
 
     total_time = time.time() - start_time

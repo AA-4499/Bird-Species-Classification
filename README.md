@@ -78,7 +78,16 @@ To train the advanced **ConvNeXt-Tiny**:
 ```bash
 python train.py --model convnext_tiny --epochs 15 --batch_size 16 --lr 1e-4
 ```
-*Note: Checkpoints will be automatically saved to `checkpoints/best_{model_name}.pth` when validation Average Class Accuracy improves.*
+Checkpoints are saved during training:
+- `checkpoints/latest_{model_name}.pth` is overwritten after every epoch and contains the model, optimizer, scheduler, AMP scaler, epoch, and training history.
+- `checkpoints/best_{model_name}.pth` is saved whenever validation Average Class Accuracy improves and is used for evaluation.
+
+To resume interrupted training from the latest checkpoint and continue until epoch 30:
+```bash
+python train.py --model convnext_tiny --epochs 30 --resume checkpoints/latest_convnext_tiny.pth
+```
+
+The `--epochs` value is the target final epoch, not the number of additional epochs.
 
 ### 4. Official Test Set Evaluation
 ```bash
