@@ -33,7 +33,7 @@ The system addresses the core challenge of **Fine-Grained Visual Categorization 
 
 ```
 Assignment1/
-├── app.py                      # Interactive Gradio web application for Hugging Face Spaces
+├── app.py                      # Interactive Streamlit web application
 ├── requirements.txt            # Deployment and execution dependencies
 ├── dataset.py                  # PyTorch Dataset, stratified split, and data augmentation transforms
 ├── models.py                   # Model builders for ResNet-50 and ConvNeXt-Tiny
@@ -86,11 +86,11 @@ python evaluate.py --checkpoint checkpoints/best_convnext_tiny.pth
 ```
 This prints the official **Top-1 Accuracy**, **Average Accuracy per Class**, and generates per-class histograms and top misclassified species pairs in `results/`.
 
-### 5. Launch Interactive Gradio Web App Locally
+### 5. Launch Interactive Streamlit Web App Locally
 ```bash
-python app.py
+streamlit run app.py
 ```
-Open your browser at `http://localhost:7860` to test bird images via drag-and-drop or sample test buttons.
+Open the displayed local URL to upload bird images, choose a test image, and view the top-five predictions.
 
 ### 6. Deploy to Hugging Face Spaces
 1. Create a new Space on [Hugging Face Spaces](https://huggingface.co/spaces) with **Gradio** SDK.
