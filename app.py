@@ -209,7 +209,15 @@ def render_model_page() -> None:
 st.set_page_config(page_title="CUB-200 Bird Classifier", page_icon="🦜", layout="wide")
 with st.sidebar:
     st.markdown("### 🦜 Bird Classifier")
-    page = st.radio("Go to", ["Home", "Model"], index=0, label_visibility="collapsed")
+    if "page" not in st.session_state:
+        st.session_state.page = "Home"
+
+    if st.button("Home", use_container_width=True):
+        st.session_state.page = "Home"
+    if st.button("Model", use_container_width=True):
+        st.session_state.page = "Model"
+
+    page = st.session_state.page
 
 if page == "Home":
     render_home()
