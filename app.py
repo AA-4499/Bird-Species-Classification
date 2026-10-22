@@ -1,7 +1,9 @@
 """Streamlit interface for CUB-200 bird species classification."""
 
 import glob
+import json
 import os
+from typing import Dict, Optional, Tuple
 
 import streamlit as st
 import torch
@@ -18,36 +20,56 @@ class_names = load_class_names(CLASS_NAMES_PATH) if os.path.exists(CLASS_NAMES_P
     i: f"Bird Species {i}" for i in range(200)
 }
 
+MODEL_CONFIGS = {
+    "ConvNeXt-Tiny": {
+        "architecture": "convnext_tiny",
+        "checkpoint": "checkpoints/best_convnext_tiny.pth",
+        "metrics": "results/test_metrics_convnext_tiny.json",
+        "curves": "results/curves_convnext_tiny.png",
+        "histogram": "results/class_acc_hist_convnext_tiny.png",
+    },
+    "ResNet-50": {
+        "architecture": "resnet50",
+        "checkpoint": "checkpoints/best_resnet50.pth",
+        "metrics": "results/test_metrics_resnet50.json",
+        "curves": "results/curves_resnet50.png",
+        "histogram": "results/class_acc_hist_resnet50.png",
+    },
+}
+
 EVAL_TRANSFORM = transforms.Compose([
     transforms.Resize((256, 256)),
     transforms.CenterCrop(224),
     transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
 
 @st.cache_resource
-def load_model():
-    for arch_name, checkpoint_path in [
-        ("convnext_tiny", "checkpoints/best_convnext_tiny.pth"),
-        ("resnet50", "checkpoints/best_resnet50.pth"),
-    ]:
-        if os.path.exists(checkpoint_path):
-            try:
-                checkpoint = torch.load(checkpoint_path, map_location=DEVICE)
-                model = build_model(arch_name, num_classes=200, pretrained=False)
-                model.load_state_dict(checkpoint["model_state_dict"])
-                model.to(DEVICE).eval()
-                return model, arch_name.upper(), True
-            except Exception as error:
-                st.warning(f"Could not load {checkpoint_path}: {error}")
+def load_model(model_label: str) -> Tuple[torch.nn.Module, bool]:
+    """Load the selected trained model, or an ImageNet fallback if unavailable."""
+    config = MODEL_CONFIGS[model_label]
+    checkpoint_path = config["checkpoint"]
 
-    model = build_model("convnext_tiny", num_classes=200, pretrained=True)
+    if os.path.exists(checkpoint_path):
+        try:
+            checkpoint = torch.load(checkpoint_path, map_location=DEVICE)
+            model = build_model(config["architecture"], num_classes=200, pretrained=False)
+            model.load_state_dict(checkpoint["model_state_dict"])
+            model.to(DEVICE).eval()
+            return model, True
+        except (KeyError, RuntimeError, OSError) as error:
+            st.warning(f"Could not load {checkpoint_path}: {error}")
+
+    model = build_model(config["architecture"], num_classes=200, pretrained=True)
     model.to(DEVICE).eval()
-    return model, "CONVNEXT_TINY (IMAGENET DEMO)", False
+    return model, False
 
 
-def predict_bird(input_image, model):
+def predict_bird(
+    input_image: Image.Image, model: torch.nn.Module
+) -> Tuple[Dict[str, float], int, float]:
+    """Return the top-five species, top class index, and top confidence."""
     image_tensor = EVAL_TRANSFORM(input_image.convert("RGB")).unsqueeze(0).to(DEVICE)
     with torch.no_grad():
         probabilities = torch.softmax(model(image_tensor), dim=1)[0].cpu().numpy()
@@ -60,37 +82,140 @@ def predict_bird(input_image, model):
     return results, int(top_indices[0]), float(probabilities[top_indices[0]])
 
 
+def render_home() -> None:
+    """Render the bird classifier page."""
+    st.title("🦜 CUB-200 Bird Species Classifier")
+    st.write("Upload a bird photograph to see the five most likely species.")
+
+    model_label = st.selectbox(
+        "Choose a model",
+        list(MODEL_CONFIGS),
+        help="Scroll through the list to select the model used for classification.",
+    )
+    model, has_checkpoint = load_model(model_label)
+    st.caption(f"Model: {model_label} | Device: {DEVICE.type}")
+    if not has_checkpoint:
+        st.info(
+            "No trained checkpoint was found for this model. "
+            "The ImageNet demo weights are being used."
+        )
+
+    sample_paths = sorted(
+        glob.glob("Test/*.jpg") + glob.glob("Test/*.jpeg") + glob.glob("Test/*.png")
+    )
+    sample_choice = st.selectbox("Or choose a test image", ["None"] + sample_paths)
+    uploaded_file = st.file_uploader(
+        "Upload a bird photograph", type=["jpg", "jpeg", "png"]
+    )
+
+    input_image: Optional[Image.Image] = (
+        Image.open(uploaded_file) if uploaded_file is not None else None
+    )
+    if input_image is None and sample_choice != "None":
+        input_image = Image.open(sample_choice)
+
+    if input_image is not None:
+        st.image(input_image, caption="Selected image", use_container_width=True)
+        if st.button("Identify bird species", type="primary"):
+            try:
+                results, top_index, confidence = predict_bird(input_image, model)
+                left, right = st.columns(2)
+                with left:
+                    st.subheader("Top prediction")
+                    st.metric("Species", class_names.get(top_index, f"Species {top_index}"))
+                    st.metric("Confidence", f"{confidence * 100:.2f}%")
+                with right:
+                    st.subheader("Top 5 probabilities")
+                    st.bar_chart(results)
+            except (RuntimeError, ValueError) as error:
+                st.error(f"Prediction failed: {error}")
+    else:
+        st.warning("Upload an image or choose a test image to begin.")
+
+
+def load_metrics(model_label: str) -> Optional[dict]:
+    """Load saved evaluation results for a model when available."""
+    metrics_path = MODEL_CONFIGS[model_label]["metrics"]
+    if not os.path.exists(metrics_path):
+        return None
+    try:
+        with open(metrics_path, "r", encoding="utf-8") as metrics_file:
+            return json.load(metrics_file)
+    except (OSError, json.JSONDecodeError) as error:
+        st.error(f"Could not read {metrics_path}: {error}")
+        return None
+
+
+def render_model_page() -> None:
+    """Render saved performance images and evaluation results for each model."""
+    st.title("📊 Model Performance")
+    st.write("Compare the trained models using results from the official CUB-200 test set.")
+
+    model_label = st.selectbox("Choose a model to inspect", list(MODEL_CONFIGS))
+    config = MODEL_CONFIGS[model_label]
+    metrics = load_metrics(model_label)
+
+    if metrics is None:
+        st.warning("No evaluation result is available for this model yet.")
+        return
+
+    metric_columns = st.columns(3)
+    metric_columns[0].metric("Top-1 accuracy", f"{metrics['top1_accuracy_pct']:.2f}%")
+    metric_columns[1].metric(
+        "Average class accuracy",
+        f"{metrics['average_accuracy_per_class_pct']:.2f}%",
+    )
+    metric_columns[2].metric("Test images", metrics["total_test_samples"])
+
+    st.subheader(f"{model_label} training performance")
+    if os.path.exists(config["curves"]):
+        st.image(config["curves"], caption=f"{model_label} loss and accuracy curves")
+    else:
+        st.info("Training curve image is not available.")
+
+    chart_columns = st.columns(2)
+    with chart_columns[0]:
+        st.subheader("Per-class accuracy distribution")
+        if os.path.exists(config["histogram"]):
+            st.image(config["histogram"], caption=f"{model_label} class accuracy histogram")
+        else:
+            st.info("Class accuracy histogram is not available.")
+
+    with chart_columns[1]:
+        st.subheader("Most confused species")
+        confused_pairs = metrics.get("top_confused_pairs", [])
+        if confused_pairs:
+            st.dataframe(
+                [
+                    {
+                        "True species": pair["true_name"],
+                        "Predicted species": pair["pred_name"],
+                        "Errors": pair["error_count"],
+                    }
+                    for pair in confused_pairs
+                ],
+                hide_index=True,
+                use_container_width=True,
+            )
+        else:
+            st.info("Confusion results are not available.")
+
+    st.subheader("Best and hardest classes")
+    best, hardest = st.columns(2)
+    with best:
+        st.write("Highest accuracy")
+        st.dataframe(metrics.get("highest_5_classes", []), hide_index=True, use_container_width=True)
+    with hardest:
+        st.write("Lowest accuracy")
+        st.dataframe(metrics.get("lowest_5_classes", []), hide_index=True, use_container_width=True)
+
+
 st.set_page_config(page_title="CUB-200 Bird Classifier", page_icon="🦜", layout="wide")
-st.title("🦜 CUB-200 Bird Species Classifier")
-st.write("Upload a bird photograph to see the five most likely species.")
+with st.sidebar:
+    st.title("🦜 Bird Classifier")
+    page = st.radio("Navigation", ["Home", "Model"], index=0)
 
-model, model_name, has_checkpoint = load_model()
-st.caption(f"Model: {model_name} | Device: {DEVICE.type}")
-if not has_checkpoint:
-    st.info("No trained checkpoint was found. The ImageNet demo model is loaded; add checkpoints/best_convnext_tiny.pth for trained predictions.")
-
-sample_paths = sorted(glob.glob("Test/*.jpg") + glob.glob("Test/*.jpeg") + glob.glob("Test/*.png"))
-sample_choice = st.selectbox("Or choose a test image", ["None"] + sample_paths)
-uploaded_file = st.file_uploader("Upload a bird photograph", type=["jpg", "jpeg", "png"])
-
-input_image = Image.open(uploaded_file) if uploaded_file is not None else None
-if input_image is None and sample_choice != "None":
-    input_image = Image.open(sample_choice)
-
-if input_image is not None:
-    st.image(input_image, caption="Selected image", use_container_width=True)
-    if st.button("Identify bird species", type="primary"):
-        try:
-            results, top_index, confidence = predict_bird(input_image, model)
-            left, right = st.columns(2)
-            with left:
-                st.subheader("Top prediction")
-                st.metric("Species", class_names.get(top_index, f"Species {top_index}"))
-                st.metric("Confidence", f"{confidence * 100:.2f}%")
-            with right:
-                st.subheader("Top 5 probabilities")
-                st.bar_chart(results)
-        except Exception as error:
-            st.error(f"Prediction failed: {error}")
+if page == "Home":
+    render_home()
 else:
-    st.warning("Upload an image or choose a test image to begin.")
+    render_model_page()

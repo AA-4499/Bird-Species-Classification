@@ -99,7 +99,9 @@ This prints the official **Top-1 Accuracy**, **Average Accuracy per Class**, and
 ```bash
 streamlit run app.py
 ```
-Open the displayed local URL to upload bird images, choose a test image, and view the top-five predictions.
+Open the displayed local URL to use the two sidebar pages:
+- **Home**: choose a trained model from the scrollable model selector, upload a bird image (or select a test image), and view the top-five predictions.
+- **Model**: choose either model to view its saved training curves, per-class accuracy histogram, evaluation metrics, and most-confused species.
 
 ### 6. Deploy to Hugging Face Spaces
 1. Create a new Space on [Hugging Face Spaces](https://huggingface.co/spaces) with **Gradio** SDK.
