@@ -207,80 +207,9 @@ def render_model_page() -> None:
 
 
 st.set_page_config(page_title="CUB-200 Bird Classifier", page_icon="🦜", layout="wide")
-st.markdown(
-    """
-    <style>
-    [data-testid="stSidebar"] {
-        min-width: 280px;
-        max-width: 280px;
-        background: linear-gradient(180deg, #102a43 0%, #163f5f 58%, #0b2239 100%);
-    }
-    [data-testid="stSidebar"] > div:first-child {
-        padding: 2rem 1.25rem 1.25rem;
-    }
-    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h1 {
-        color: #f7fbff;
-        font-size: 1.45rem;
-        letter-spacing: -0.02em;
-        margin-bottom: 0.25rem;
-    }
-    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
-        color: #c9d9e8;
-    }
-    [data-testid="stSidebar"] div[role="radiogroup"] {
-        gap: 0.55rem;
-        margin-top: 0.35rem;
-    }
-    [data-testid="stSidebar"] div[role="radiogroup"] label {
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 0.7rem;
-        padding: 0.65rem 0.8rem;
-        transition: background 120ms ease, border-color 120ms ease;
-    }
-    [data-testid="stSidebar"] div[role="radiogroup"] label:hover {
-        background: rgba(255, 255, 255, 0.16);
-        border-color: rgba(255, 255, 255, 0.3);
-    }
-    [data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
-        background: #f15b5d;
-        border-color: #ff8b89;
-        box-shadow: 0 5px 14px rgba(0, 0, 0, 0.18);
-    }
-    [data-testid="stSidebar"] div[role="radiogroup"] label p {
-        color: #f7fbff;
-        font-weight: 600;
-        margin: 0;
-    }
-    .sidebar-section-label {
-        color: #8fb6d2;
-        font-size: 0.72rem;
-        font-weight: 700;
-        letter-spacing: 0.12em;
-        margin: 1.5rem 0 0.45rem;
-        text-transform: uppercase;
-    }
-    .sidebar-footer {
-        border-top: 1px solid rgba(255, 255, 255, 0.15);
-        color: #a9c0d3;
-        font-size: 0.78rem;
-        line-height: 1.5;
-        margin-top: 2.2rem;
-        padding-top: 1rem;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
 with st.sidebar:
-    st.title("🦜 Bird Classifier")
-    st.caption("CUB-200 · Fine-grained species recognition")
-    st.markdown('<div class="sidebar-section-label">Workspace</div>', unsafe_allow_html=True)
-    page = st.radio("Navigation", ["Home", "Model"], index=0)
-    st.markdown(
-        '<div class="sidebar-footer">Upload a bird image to classify it, or explore the evaluation metrics and model performance.</div>',
-        unsafe_allow_html=True,
-    )
+    st.markdown("### 🦜 Bird Classifier")
+    page = st.radio("Go to", ["Home", "Model"], index=0, label_visibility="collapsed")
 
 if page == "Home":
     render_home()
