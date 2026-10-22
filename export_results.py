@@ -10,6 +10,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+def load_history(path):
+    """Load legacy array-only histories and metadata-wrapped histories."""
+    with open(path, "r", encoding="utf-8") as history_file:
+        payload = json.load(history_file)
+    return payload.get("history", payload)
+
+
 def generate_comparison_plots():
     os.makedirs("results", exist_ok=True)
     
@@ -22,10 +29,8 @@ def generate_comparison_plots():
                 f"Training history is required to export measured results: {history_path}"
             )
 
-    with open(resnet_hist_path, "r", encoding="utf-8") as f:
-        resnet_hist = json.load(f)
-    with open(convnext_hist_path, "r", encoding="utf-8") as f:
-        convnext_hist = json.load(f)
+    resnet_hist = load_history(resnet_hist_path)
+    convnext_hist = load_history(convnext_hist_path)
 
     epochs = range(1, len(resnet_hist["train_loss"]) + 1)
 

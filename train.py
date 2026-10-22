@@ -114,6 +114,7 @@ def main():
     parser.add_argument("--val_ratio", type=float, default=0.15, help="Validation split proportion (default: 0.15)")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--save_dir", type=str, default="checkpoints", help="Directory to save model weights")
+    parser.add_argument("--results_dir", type=str, default="results", help="Directory to save training curves")
     parser.add_argument("--resume", type=str, default=None,
                         help="Path to a checkpoint to resume training from")
     args = parser.parse_args()
@@ -123,7 +124,7 @@ def main():
     print(f"[INFO] Using compute device: {device} ({torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'})")
 
     os.makedirs(args.save_dir, exist_ok=True)
-    os.makedirs("results", exist_ok=True)
+    os.makedirs(args.results_dir, exist_ok=True)
 
     # 1. Build DataLoaders
     print(f"[INFO] Loading CUB-200 dataset with stratified {int((1-args.val_ratio)*100)}/{int(args.val_ratio*100)} split...")
@@ -218,6 +219,16 @@ def main():
         checkpoint = {
             "epoch": epoch,
             "model_name": args.model,
+            "seed": args.seed,
+            "training_config": {
+                "epochs": args.epochs,
+                "batch_size": args.batch_size,
+                "lr": args.lr,
+                "weight_decay": args.weight_decay,
+                "label_smoothing": args.label_smoothing,
+                "drop_rate": args.drop_rate,
+                "val_ratio": args.val_ratio,
+            },
             "model_state_dict": model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict(),
             "scheduler_state_dict": scheduler.state_dict(),
@@ -242,11 +253,21 @@ def main():
 
     # Save training history JSON
     history_path = os.path.join(args.save_dir, f"history_{args.model}.json")
+    history_payload = {
+        "model_name": args.model,
+        "seed": args.seed,
+        "training_config": checkpoint["training_config"],
+        "history": history,
+    }
     with open(history_path, "w", encoding="utf-8") as f:
-        json.dump(history, f, indent=2)
+        json.dump(history_payload, f, indent=2)
 
     # Plot training curves
-    plot_training_history(history, model_name=args.model.upper(), save_path=f"results/curves_{args.model}.png")
+    plot_training_history(
+        history,
+        model_name=args.model.upper(),
+        save_path=os.path.join(args.results_dir, f"curves_{args.model}.png"),
+    )
 
 
 if __name__ == "__main__":

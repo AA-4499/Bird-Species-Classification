@@ -36,6 +36,8 @@ MODEL_CONFIGS = {
         "histogram": "results/class_acc_hist_resnet50.png",
     },
 }
+EXPERIMENT_SUMMARY_PATH = "experiments/results/multi_seed_summary.json"
+EXPERIMENT_PLOT_PATH = "experiments/results/multi_seed_comparison.png"
 
 EVAL_TRANSFORM = transforms.Compose([
     transforms.Resize((256, 256)),
@@ -206,6 +208,63 @@ def render_model_page() -> None:
         st.dataframe(metrics.get("lowest_5_classes", []), hide_index=True, use_container_width=True)
 
 
+def render_experiment_page() -> None:
+    """Render aggregate results from the isolated multi-seed experiment."""
+    st.title("🧪 Multi-seed Experiment")
+    st.write(
+        "Independent full-configuration runs measure run-to-run variation; "
+        "they do not isolate individual training techniques."
+    )
+    if not os.path.exists(EXPERIMENT_SUMMARY_PATH):
+        st.info(
+            "Experiment results are not available yet. Run "
+            "`python experiment_runner.py` to create the six runs."
+        )
+        return
+
+    try:
+        with open(EXPERIMENT_SUMMARY_PATH, "r", encoding="utf-8") as summary_file:
+            summary = json.load(summary_file)
+    except (OSError, json.JSONDecodeError) as error:
+        st.error(f"Could not read experiment results: {error}")
+        return
+
+    for model, model_results in summary.get("models", {}).items():
+        st.subheader(model.replace("_", " ").title())
+        metric_columns = st.columns(2)
+        top1 = model_results["top1_accuracy_pct"]
+        average_class = model_results["average_accuracy_per_class_pct"]
+        metric_columns[0].metric(
+            "Top-1 accuracy",
+            f"{top1['mean']:.2f}% ± {top1['std']:.2f}%",
+        )
+        metric_columns[1].metric(
+            "Average class accuracy",
+            f"{average_class['mean']:.2f}% ± {average_class['std']:.2f}%",
+        )
+        st.dataframe(
+            [
+                {
+                    "Seed": run["seed"],
+                    "Top-1 accuracy": f"{run['top1_accuracy_pct']:.2f}%",
+                    "Average class accuracy": f"{run['average_accuracy_per_class_pct']:.2f}%",
+                }
+                for run in model_results.get("runs", [])
+            ],
+            hide_index=True,
+            use_container_width=True,
+        )
+
+    if os.path.exists(EXPERIMENT_PLOT_PATH):
+        st.image(
+            EXPERIMENT_PLOT_PATH,
+            caption="Mean accuracy with standard deviation and individual seed scores",
+            use_container_width=True,
+        )
+    else:
+        st.info("The experiment comparison image is not available yet.")
+
+
 st.set_page_config(page_title="CUB-200 Bird Classifier", page_icon="🦜", layout="wide")
 with st.sidebar:
     st.markdown("### 🦜 Bird Classifier")
@@ -216,10 +275,14 @@ with st.sidebar:
         st.session_state.page = "Home"
     if st.button("Model", use_container_width=True):
         st.session_state.page = "Model"
+    if st.button("Experiment", use_container_width=True):
+        st.session_state.page = "Experiment"
 
     page = st.session_state.page
 
 if page == "Home":
     render_home()
-else:
+elif page == "Model":
     render_model_page()
+else:
+    render_experiment_page()

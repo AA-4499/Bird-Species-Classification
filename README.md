@@ -28,7 +28,13 @@ The system addresses the core challenge of **Fine-Grained Visual Categorization 
 
 ---
 
-## 📂 Repository Structure
+## Production
+
+The production record uses the existing checkpoints and evaluation JSONs in
+`checkpoints/` and `results/`. These artifacts remain separate from the
+multi-seed experiment and are the reference for the deployed applications.
+
+### Repository Structure
 
 ```
 Assignment1/
@@ -56,7 +62,7 @@ Assignment1/
 
 ---
 
-## 🚀 Quickstart & Usage Instructions
+### Production Quickstart
 
 ### 1. Install Dependencies
 ```bash
@@ -99,17 +105,63 @@ This prints the official **Top-1 Accuracy**, **Average Accuracy per Class**, and
 ```bash
 streamlit run app.py
 ```
-Open the displayed local URL to use the two sidebar pages:
+Open the displayed local URL to use the three sidebar pages:
 - **Home**: choose a trained model from the scrollable model selector, upload a bird image (or select a test image), and view the top-five predictions.
 - **Model**: choose either model to view its saved training curves, per-class accuracy histogram, evaluation metrics, and most-confused species.
+- **Experiment**: view multi-seed results after running the experiment workflow below.
 
-### 6. Deployed Hugging Face Space
+### Production Deployment
 The production Gradio application is maintained in [`hf_space/`](hf_space/) and is
 available at the [deployed Hugging Face Space](https://huggingface.co/spaces/AA-49/Bird-Species-Classification).
 It requires the trained checkpoint and `data/class_names.json`; startup fails
 explicitly if either production asset is missing.
 
 ---
+
+## Experiment
+
+The multi-seed experiment repeats the complete training configuration for both
+architectures with seeds **42, 43, and 44**, for exactly **15 epochs per run**.
+It measures run-to-run variation; it does not isolate the effect of individual
+augmentations, label smoothing, dropout, or optimizer settings.
+
+### Run the six experiments
+
+Verify the schedule without starting training:
+
+```bash
+python experiment_runner.py --dry-run
+```
+
+Run all six training and evaluation jobs:
+
+```bash
+python experiment_runner.py
+```
+
+Each run is isolated under:
+
+```text
+experiments/runs/<model>/seed_<seed>/
+├── best_<model>.pth
+├── latest_<model>.pth
+├── history_<model>.json
+├── test_metrics_<model>.json
+└── run_config.json
+```
+
+Aggregate metrics and the comparison plot are written to:
+
+```text
+experiments/results/multi_seed_summary.json
+experiments/results/multi_seed_comparison.png
+```
+
+The local Streamlit **Experiment** page reads those aggregate artifacts and
+displays each seed's scores, the mean, and standard deviation. Missing
+experiment data is reported without affecting the production Home or Model
+pages. The runner uses dedicated output directories, so it never overwrites
+production checkpoints or `results/` artifacts.
 
 ## 📊 Summary of Results
 

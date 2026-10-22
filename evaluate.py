@@ -32,7 +32,8 @@ def evaluate_checkpoint(
     test_txt: str = "test.txt",
     class_names_path: str = "data/class_names.json",
     batch_size: int = 32,
-    device: str = "cuda"
+    device: str = "cuda",
+    output_dir: str = "results",
 ):
     """Run full evaluation on official test dataset using a trained checkpoint."""
     device = torch.device(device if torch.cuda.is_available() else "cpu")
@@ -118,6 +119,8 @@ def evaluate_checkpoint(
     results_payload = {
         "model_name": model_name,
         "checkpoint_path": checkpoint_path,
+        "seed": checkpoint.get("seed"),
+        "training_config": checkpoint.get("training_config", {}),
         "total_test_samples": len(all_targets),
         "top1_accuracy_pct": float(round(top1_acc * 100, 2)),
         "average_accuracy_per_class_pct": float(round(ave_class_acc * 100, 2)),
@@ -126,8 +129,8 @@ def evaluate_checkpoint(
         "highest_5_classes": [{"class_id": c, "name": n, "accuracy_pct": round(a*100, 2)} for c, n, a in highest_5]
     }
 
-    os.makedirs("results", exist_ok=True)
-    out_json = f"results/test_metrics_{model_name}.json"
+    os.makedirs(output_dir, exist_ok=True)
+    out_json = os.path.join(output_dir, f"test_metrics_{model_name}.json")
     with open(out_json, "w", encoding="utf-8") as f:
         json.dump(results_payload, f, indent=2)
     print(f"[INFO] Saved test metrics to {out_json}")
@@ -141,7 +144,7 @@ def evaluate_checkpoint(
     ax.set_ylabel("Number of Species (out of 200)", fontsize=11)
     ax.grid(True, linestyle=":", alpha=0.6)
     plt.tight_layout()
-    hist_plot_path = f"results/class_acc_hist_{model_name}.png"
+    hist_plot_path = os.path.join(output_dir, f"class_acc_hist_{model_name}.png")
     plt.savefig(hist_plot_path, dpi=300)
     plt.close()
     print(f"[INFO] Saved histogram to {hist_plot_path}")
@@ -155,9 +158,16 @@ def main():
     parser.add_argument("--test_dir", type=str, default="Test", help="Path to test image folder")
     parser.add_argument("--test_txt", type=str, default="test.txt", help="Path to test.txt annotation")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for inference")
+    parser.add_argument("--output_dir", type=str, default="results", help="Directory for evaluation artifacts")
     args = parser.parse_args()
 
-    evaluate_checkpoint(args.checkpoint, test_dir=args.test_dir, test_txt=args.test_txt, batch_size=args.batch_size)
+    evaluate_checkpoint(
+        args.checkpoint,
+        test_dir=args.test_dir,
+        test_txt=args.test_txt,
+        batch_size=args.batch_size,
+        output_dir=args.output_dir,
+    )
 
 
 if __name__ == "__main__":
