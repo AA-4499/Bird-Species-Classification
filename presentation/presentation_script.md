@@ -4,7 +4,6 @@
 **Student Name:** Andy Wei Jian CHU  
 **Student ID:** 104401283  
 **Subject:** COS30082 Applied Machine Learning --- Assignment 1 (20%)  
-**YouTube Presentation Video Link:** [https://youtu.be/placeholder-presentation-link](https://youtu.be/placeholder-presentation-link)  
 **Hugging Face Spaces App Link:** [https://huggingface.co/spaces/AA-49/Bird-Species-Classification](https://huggingface.co/spaces/AA-49/Bird-Species-Classification)
 
 ---
@@ -123,8 +122,8 @@
 ### Slide 6: Experimental Results & Discussion (6:45 - 8:15)
 **Visuals on Slide:**
 - Results Comparison Table:
-  - ResNet-50: 78.41% Top-1 Acc, 77.85% Ave Class Acc.
-  - ConvNeXt-Tiny: 84.39% Top-1 Acc, 83.92% Ave Class Acc (+5.98% / +6.07% gain).
+  - ResNet-50: 80.65% Top-1 Acc, 80.11% Ave Class Acc.
+  - ConvNeXt-Tiny: 89.53% Top-1 Acc, 89.36% Ave Class Acc (+8.88% / +9.25% gain).
 - Training / Validation loss and accuracy curves.
 - Confusion Analysis Callout: Top confused pairs (Laysan Albatross vs. Black-footed Albatross, Glaucous-winged Gull vs. Western Gull).
 
@@ -134,8 +133,8 @@
 > Overall Top-1 Accuracy, and Average Accuracy per Class across all 200 species.
 > 
 > As you can see in the table, **ConvNeXt-Tiny decisively outperformed ResNet-50**.
-> It achieved **84.39% Top-1 Accuracy** compared to ResNet's 78.41% — an absolute improvement of almost 6%.
-> On **Average Accuracy per Class**, ConvNeXt reached **83.92%**, outperforming ResNet's 77.85% by over 6%.
+> It achieved **89.53% Top-1 Accuracy** compared to ResNet's 80.65% — an absolute improvement of 8.88%.
+> On **Average Accuracy per Class**, ConvNeXt reached **89.36%**, outperforming ResNet's 80.11% by 9.25%.
 > 
 > Looking at the training curves, without our regularization suite, models suffered from severe overfitting where training accuracy reached 99% but validation stalled at 61%. With our augmentations and label smoothing, the generalization gap contracted to under 7%.
 > 
@@ -172,6 +171,6 @@
 - Contact / GitHub / Hugging Face links.
 
 **Spoken Script:**
-> *"To conclude, this project successfully developed and deployed a robust machine learning system for the CUB-200 fine-grained bird classification challenge. By modernizing our convolutional architecture with ConvNeXt-Tiny and implementing a rigorous regularization suite with label smoothing and random resized crops, we achieved 84.39% Top-1 Accuracy and 83.92% Average Class Accuracy.
+> *"To conclude, this project successfully developed and deployed a robust machine learning system for the CUB-200 fine-grained bird classification challenge. By modernizing our convolutional architecture with ConvNeXt-Tiny and implementing a rigorous regularization suite with label smoothing and random resized crops, we achieved 89.53% Top-1 Accuracy and 89.36% Average Class Accuracy.
 > 
 > Thank you very much for your time and attention. All code, checkpoints, and documentation are available in the submission repository and on Hugging Face Spaces."*

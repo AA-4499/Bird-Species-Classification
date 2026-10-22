@@ -5,8 +5,7 @@
 **Student ID:** 104401283  
 **Institution:** Swinburne University of Technology  
 **Weighting:** 20%  
-**Hugging Face Spaces Application:** [https://huggingface.co/spaces/AA-49/Bird-Species-Classification](https://huggingface.co/spaces/AA-49/Bird-Species-Classification) *(Replace with your deployed Space URL)*  
-**Video Presentation (YouTube):** [https://youtu.be/placeholder-presentation-link](https://youtu.be/placeholder-presentation-link) *(Attach your recorded presentation link)*
+**Hugging Face Spaces Application:** [https://huggingface.co/spaces/AA-49/Bird-Species-Classification](https://huggingface.co/spaces/AA-49/Bird-Species-Classification)
 
 ---
 
@@ -33,7 +32,8 @@ The system addresses the core challenge of **Fine-Grained Visual Categorization 
 
 ```
 Assignment1/
-├── app.py                      # Interactive Streamlit web application
+├── app.py                      # Optional local Streamlit evaluation interface
+├── hf_space/app.py             # Deployed Gradio web application
 ├── requirements.txt            # Deployment and execution dependencies
 ├── dataset.py                  # PyTorch Dataset, stratified split, and data augmentation transforms
 ├── models.py                   # Model builders for ResNet-50 and ConvNeXt-Tiny
@@ -95,7 +95,7 @@ python evaluate.py --checkpoint checkpoints/best_convnext_tiny.pth
 ```
 This prints the official **Top-1 Accuracy**, **Average Accuracy per Class**, and generates per-class histograms and top misclassified species pairs in `results/`.
 
-### 5. Launch Interactive Streamlit Web App Locally
+### 5. Launch the Local Evaluation Interface
 ```bash
 streamlit run app.py
 ```
@@ -103,16 +103,11 @@ Open the displayed local URL to use the two sidebar pages:
 - **Home**: choose a trained model from the scrollable model selector, upload a bird image (or select a test image), and view the top-five predictions.
 - **Model**: choose either model to view its saved training curves, per-class accuracy histogram, evaluation metrics, and most-confused species.
 
-### 6. Deploy to Hugging Face Spaces
-1. Create a new Space on [Hugging Face Spaces](https://huggingface.co/spaces) with **Gradio** SDK.
-2. Clone your Space repository locally or upload via Git:
-   - `app.py`
-   - `requirements.txt`
-   - `models.py`
-   - `utils.py`
-   - `data/class_names.json`
-   - `checkpoints/best_convnext_tiny.pth`
-3. Push to Hugging Face: the web application will automatically build and go live within 2 minutes!
+### 6. Deployed Hugging Face Space
+The production Gradio application is maintained in [`hf_space/`](hf_space/) and is
+available at the [deployed Hugging Face Space](https://huggingface.co/spaces/AA-49/Bird-Species-Classification).
+It requires the trained checkpoint and `data/class_names.json`; startup fails
+explicitly if either production asset is missing.
 
 ---
 
@@ -120,8 +115,8 @@ Open the displayed local URL to use the two sidebar pages:
 
 | Metric | Baseline: ResNet-50 | Advanced: ConvNeXt-Tiny | Relative Improvement |
 | :--- | :---: | :---: | :---: |
-| **Top-1 Accuracy** | **78.41%** | **84.39%** | **+5.98%** |
-| **Average Accuracy per Class** | **77.85%** | **83.92%** | **+6.07%** |
+| **Top-1 Accuracy** | **80.65%** | **89.53%** | **+8.88%** |
+| **Average Accuracy per Class** | **80.11%** | **89.36%** | **+9.25%** |
 | Parameters | 24.5M | 28.0M | +14.2% |
 | Peak VRAM (FP16) | 1.12 GB | 1.18 GB | +5.3% |
 | Regularization Suite | Augmentations + Label Smoothing | Augmentations + Label Smoothing | Identical |

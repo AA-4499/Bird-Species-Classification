@@ -13,30 +13,19 @@ import numpy as np
 def generate_comparison_plots():
     os.makedirs("results", exist_ok=True)
     
-    # Load history files if available
     resnet_hist_path = "checkpoints/history_resnet50.json"
     convnext_hist_path = "checkpoints/history_convnext_tiny.json"
 
-    # Default representative training curves if full offline training logs are pending
-    if os.path.exists(resnet_hist_path):
-        with open(resnet_hist_path, "r") as f:
-            resnet_hist = json.load(f)
-    else:
-        resnet_hist = {
-            "train_loss": [4.82, 3.45, 2.76, 2.21, 1.83, 1.54, 1.32, 1.15, 1.01, 0.90, 0.81, 0.75, 0.70, 0.67, 0.65],
-            "val_top1": [0.28, 0.44, 0.55, 0.62, 0.68, 0.71, 0.73, 0.75, 0.76, 0.77, 0.775, 0.78, 0.782, 0.784, 0.784],
-            "val_ave_class": [0.26, 0.42, 0.53, 0.61, 0.67, 0.70, 0.72, 0.74, 0.75, 0.76, 0.768, 0.772, 0.775, 0.778, 0.779]
-        }
+    for history_path in (resnet_hist_path, convnext_hist_path):
+        if not os.path.exists(history_path):
+            raise FileNotFoundError(
+                f"Training history is required to export measured results: {history_path}"
+            )
 
-    if os.path.exists(convnext_hist_path):
-        with open(convnext_hist_path, "r") as f:
-            convnext_hist = json.load(f)
-    else:
-        convnext_hist = {
-            "train_loss": [4.51, 3.12, 2.38, 1.85, 1.48, 1.22, 1.04, 0.89, 0.78, 0.69, 0.62, 0.57, 0.53, 0.50, 0.48],
-            "val_top1": [0.35, 0.52, 0.64, 0.71, 0.76, 0.79, 0.81, 0.82, 0.828, 0.835, 0.839, 0.841, 0.843, 0.844, 0.844],
-            "val_ave_class": [0.33, 0.50, 0.62, 0.70, 0.75, 0.78, 0.80, 0.815, 0.822, 0.829, 0.833, 0.836, 0.838, 0.839, 0.839]
-        }
+    with open(resnet_hist_path, "r", encoding="utf-8") as f:
+        resnet_hist = json.load(f)
+    with open(convnext_hist_path, "r", encoding="utf-8") as f:
+        convnext_hist = json.load(f)
 
     epochs = range(1, len(resnet_hist["train_loss"]) + 1)
 
@@ -73,8 +62,8 @@ def generate_comparison_plots():
 
 | Evaluation Metric | Baseline (ResNet-50) | Advanced (ConvNeXt-Tiny) | Delta Gain |
 | :--- | :---: | :---: | :---: |
-| **Top-1 Accuracy** | **78.41%** | **84.39%** | **+5.98%** |
-| **Average Accuracy per Class** | **77.85%** | **83.92%** | **+6.07%** |
+| **Top-1 Accuracy** | **80.65%** | **89.53%** | **+8.88%** |
+| **Average Accuracy per Class** | **80.11%** | **89.36%** | **+9.25%** |
 | Pretrained Source | ImageNet-1K | ImageNet-1K (fb_in22k_ft_in1k) | - |
 | Parameter Count | 24.5 Million | 28.0 Million | +14.2% |
 | Peak Inference VRAM | 1.12 GB | 1.18 GB | +5.3% |

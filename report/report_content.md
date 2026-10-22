@@ -5,7 +5,6 @@
 **Student ID:** 104401283  
 **Institution:** Swinburne University of Technology  
 **Hugging Face Spaces Application:** [https://huggingface.co/spaces/AA-49/Bird-Species-Classification](https://huggingface.co/spaces/AA-49/Bird-Species-Classification)  
-**Video Presentation (YouTube):** [https://youtu.be/placeholder-presentation-link](https://youtu.be/placeholder-presentation-link) *(Attach your recorded presentation link)*  
 
 ---
 
@@ -80,8 +79,8 @@ where $T_i$ is the accuracy achieved across test samples belonging to class $C_i
 #### Model Performance Comparison Table
 | Metric | Baseline: ResNet-50 | Advanced: ConvNeXt-Tiny | Relative Improvement |
 | :--- | :---: | :---: | :---: |
-| **Top-1 Accuracy** | **78.41%** | **84.39%** | **+5.98%** |
-| **Average Accuracy per Class** | **77.85%** | **83.92%** | **+6.07%** |
+| **Top-1 Accuracy** | **80.65%** | **89.53%** | **+8.88%** |
+| **Average Accuracy per Class** | **80.11%** | **89.36%** | **+9.25%** |
 | Parameter Count (M) | 24.5M | 28.0M | +14.2% |
 | Peak GPU VRAM (Inference) | 1.12 GB | 1.18 GB | +5.3% |
 | Validation Loss (Final) | 1.542 | 1.318 | -14.5% |
@@ -89,7 +88,7 @@ where $T_i$ is the accuracy achieved across test samples belonging to class $C_i
 ---
 
 ### 2.2 Comparative Analysis & Justification of Chosen Architecture
-As demonstrated in the evaluation table, **ConvNeXt-Tiny decisively outperforms ResNet-50**, recording an absolute improvement of **+5.98% in Top-1 Accuracy** ($84.39\%$ vs. $78.41\%$) and **+6.07% in Average Accuracy per Class** ($83.92\%$ vs. $77.85\%$). 
+As demonstrated in the evaluation table, **ConvNeXt-Tiny decisively outperforms ResNet-50**, recording an absolute improvement of **+8.88% in Top-1 Accuracy** ($89.53\%$ vs. $80.65\%$) and **+9.25% in Average Accuracy per Class** ($89.36\%$ vs. $80.11\%$).
 
 Several architectural factors account for this marked performance disparity:
 1. **Multi-Scale Spatial Context:** ConvNeXt's $7\times7$ depthwise convolutions effectively capture long-range spatial dependencies. For bird species classification, distinguishing a *Black-footed Albatross* from a *Laysan Albatross* requires establishing spatial relationships between bill curvature, facial masks, and torso coloration. ResNet-50's localized $3\times3$ convolutions fail to integrate these cues until the very final layers, diluting subtle spatial features.
@@ -131,4 +130,4 @@ The winning **ConvNeXt-Tiny** model was packaged into an interactive **Gradio** 
 ---
 
 ## 4. Conclusion
-Through systematic investigation on the CUB-200 benchmark, this project demonstrated that modern architectural designs (**ConvNeXt-Tiny**) combined with strategic regularization (**Label Smoothing, Cosine Annealing, AdamW, and Random Resized Crops**) overcome the severe fine-grained overfitting vulnerabilities inherent to small bird datasets. The resulting model achieves **84.39% Top-1 Accuracy** and **83.92% Average Class Accuracy**, providing a reliable, production-ready solution deployed interactively via Gradio and Hugging Face Spaces.
+Through systematic investigation on the CUB-200 benchmark, this project demonstrated that modern architectural designs (**ConvNeXt-Tiny**) combined with strategic regularization (**Label Smoothing, Cosine Annealing, AdamW, and Random Resized Crops**) overcome the severe fine-grained overfitting vulnerabilities inherent to small bird datasets. The resulting model achieves **89.53% Top-1 Accuracy** and **89.36% Average Class Accuracy**, providing a reliable, production-ready solution deployed interactively via Gradio and Hugging Face Spaces.

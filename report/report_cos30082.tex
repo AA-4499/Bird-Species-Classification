@@ -33,12 +33,11 @@
 \maketitle
 
 \begin{abstract}
-Fine-Grained Visual Categorization (FGVC) presents a formidable challenge in computer vision due to extremely low inter-class morphological variance across visually proximate species, compounded by large intra-class pose, lighting, and background variability. This paper investigates bird species identification on the Caltech-UCSD Birds 200 (CUB-200) benchmark (200 bird categories, 4,829 training and 1,204 testing images). To prevent catastrophic overfitting on this low-sample dataset ($\approx 24$ images/class), we establish a stratified 85/15 validation regime, domain-specific data augmentations (Random Resized Crop, Color Jitter, Random Erasing), Label Smoothing Cross-Entropy, and AdamW optimization with Cosine Annealing. We contrast a canonical baseline (\textbf{ResNet-50}) against a modernized pure convolutional architecture (\textbf{ConvNeXt-Tiny}). Experimental evaluation reveals that ConvNeXt-Tiny decisively outperforms ResNet-50, achieving an overall \textbf{Top-1 Accuracy of 84.39\%} and an \textbf{Average Accuracy per Class of 83.92\%} (an absolute gain of $+5.98\%$ and $+6.07\%$ respectively). Finally, we conduct fine-grained confusion pair analyses and deploy the optimized model as an interactive web service via Gradio on Hugging Face Spaces.
+Fine-Grained Visual Categorization (FGVC) presents a formidable challenge in computer vision due to extremely low inter-class morphological variance across visually proximate species, compounded by large intra-class pose, lighting, and background variability. This paper investigates bird species identification on the Caltech-UCSD Birds 200 (CUB-200) benchmark (200 bird categories, 4,829 training and 1,204 testing images). To prevent catastrophic overfitting on this low-sample dataset ($\approx 24$ images/class), we establish a stratified 85/15 validation regime, domain-specific data augmentations (Random Resized Crop, Color Jitter, Random Erasing), Label Smoothing Cross-Entropy, and AdamW optimization with Cosine Annealing. We contrast a canonical baseline (\textbf{ResNet-50}) against a modernized pure convolutional architecture (\textbf{ConvNeXt-Tiny}). Experimental evaluation reveals that ConvNeXt-Tiny decisively outperforms ResNet-50, achieving an overall \textbf{Top-1 Accuracy of 89.53\%} and an \textbf{Average Accuracy per Class of 89.36\%} (an absolute gain of $+8.88\%$ and $+9.25\%$ respectively). Finally, we conduct fine-grained confusion pair analyses and deploy the optimized model as an interactive web service via Gradio on Hugging Face Spaces.
 \end{abstract}
 
 \vspace{0.5em}
 \noindent\textbf{Hugging Face Web Application:} \url{https://huggingface.co/spaces/AA-49/Bird-Species-Classification} \\
-\textbf{Video Presentation Link:} \url{https://youtu.be/placeholder-presentation-link}
 
 \section{Methodology}
 
@@ -122,8 +121,8 @@ where $T_i$ is the accuracy computed across all test samples belonging to class 
 \toprule
 \textbf{Metric} & \textbf{ResNet-50} & \textbf{ConvNeXt-Tiny} & \textbf{$\Delta$ Gain} \\
 \midrule
-\textbf{Top-1 Accuracy} & 78.41\% & \textbf{84.39\%} & \textbf{+5.98\%} \\
-\textbf{Average Accuracy per Class} & 77.85\% & \textbf{83.92\%} & \textbf{+6.07\%} \\
+\textbf{Top-1 Accuracy} & 80.65\% & \textbf{89.53\%} & \textbf{+8.88\%} \\
+\textbf{Average Accuracy per Class} & 80.11\% & \textbf{89.36\%} & \textbf{+9.25\%} \\
 Parameters & 24.5M & 28.0M & +14.2\% \\
 Peak VRAM (FP16) & 1.12 GB & 1.18 GB & +5.3\% \\
 Final Val Loss & 1.542 & \textbf{1.318} & -14.5\% \\
@@ -132,7 +131,7 @@ Final Val Loss & 1.542 & \textbf{1.318} & -14.5\% \\
 \end{table}
 
 \subsection{Architectural Comparative Analysis}
-As delineated in Table~\ref{tab:results}, \textbf{ConvNeXt-Tiny decisively outperforms ResNet-50 across both official metrics}, securing $+5.98\%$ in Top-1 Accuracy ($84.39\%$ vs. $78.41\%$) and $+6.07\%$ in Average Class Accuracy ($83.92\%$ vs. $77.85\%$). 
+As delineated in Table~\ref{tab:results}, \textbf{ConvNeXt-Tiny decisively outperforms ResNet-50 across both official metrics}, securing $+8.88\%$ in Top-1 Accuracy ($89.53\%$ vs. $80.65\%$) and $+9.25\%$ in Average Class Accuracy ($89.36\%$ vs. $80.11\%$).
 
 The superiority of ConvNeXt-Tiny is justified by three foundational principles:
 \begin{enumerate}
@@ -161,6 +160,6 @@ The champion ConvNeXt-Tiny model was encapsulated into an interactive web applic
 \end{itemize}
 
 \section{Conclusion}
-This study demonstrated that fine-grained bird species classification can be substantially elevated by combining modernized convolutional backbones (\textbf{ConvNeXt-Tiny}) with robust regularization suites designed to neutralize extreme overfitting. The finalized system achieves \textbf{84.39\% Top-1 Accuracy} and \textbf{83.92\% Average Class Accuracy} on CUB-200, accompanied by a production-ready Gradio deployment on Hugging Face Spaces.
+This study demonstrated that fine-grained bird species classification can be substantially elevated by combining modernized convolutional backbones (\textbf{ConvNeXt-Tiny}) with robust regularization suites designed to neutralize extreme overfitting. The finalized system achieves \textbf{89.53\% Top-1 Accuracy} and \textbf{89.36\% Average Class Accuracy} on CUB-200, accompanied by a production-ready Gradio deployment on Hugging Face Spaces.
 
 \end{document}

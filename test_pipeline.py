@@ -5,7 +5,7 @@ Verifies:
 2. Metric calculation correctness.
 3. DataLoader batch generation and tensor shapes.
 4. Model forward pass on CUDA device with FP16.
-5. Gradio prediction function.
+5. Local Streamlit prediction helper.
 """
 
 import os
@@ -59,11 +59,13 @@ def test_pipeline():
             assert out.shape == (4, 200), f"Expected (4, 200), got {out.shape}"
         print(f"  --> PASSED: {arch} forward pass successful on {device}!")
 
-    print("\n[TEST 5/5] Testing Gradio predict function...")
+    print("\n[TEST 5/5] Testing local app prediction helper...")
     dummy_img = Image.new("RGB", (224, 224), color=(73, 109, 137))
-    top5, details = predict_bird(dummy_img)
+    top5, top_index, confidence = predict_bird(dummy_img)
     assert len(top5) == 5, f"Expected 5 predictions, got {len(top5)}"
-    print(f"  --> PASSED: Gradio inference successful. Top 1: {list(top5.keys())[0]}")
+    assert 0 <= top_index < 200, f"Unexpected top class index: {top_index}"
+    assert 0.0 <= confidence <= 1.0, f"Unexpected confidence: {confidence}"
+    print(f"  --> PASSED: Local inference successful. Top 1: {list(top5.keys())[0]}")
 
     print("\n" + "="*50)
     print(" ALL 5 UNIT TESTS PASSED SUCCESSFULLY! ")

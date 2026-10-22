@@ -16,9 +16,9 @@ from utils import load_class_names
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 CLASS_NAMES_PATH = "data/class_names.json"
-class_names = load_class_names(CLASS_NAMES_PATH) if os.path.exists(CLASS_NAMES_PATH) else {
-    i: f"Bird Species {i}" for i in range(200)
-}
+if not os.path.exists(CLASS_NAMES_PATH):
+    raise FileNotFoundError(f"Required class mapping is missing: {CLASS_NAMES_PATH}")
+class_names = load_class_names(CLASS_NAMES_PATH)
 
 MODEL_CONFIGS = {
     "ConvNeXt-Tiny": {
@@ -46,30 +46,31 @@ EVAL_TRANSFORM = transforms.Compose([
 
 
 @st.cache_resource
-def load_model(model_label: str) -> Tuple[torch.nn.Module, bool]:
-    """Load the selected trained model, or an ImageNet fallback if unavailable."""
+def load_model(model_label: str) -> torch.nn.Module:
+    """Load the selected trained checkpoint."""
     config = MODEL_CONFIGS[model_label]
     checkpoint_path = config["checkpoint"]
 
-    if os.path.exists(checkpoint_path):
-        try:
-            checkpoint = torch.load(checkpoint_path, map_location=DEVICE)
-            model = build_model(config["architecture"], num_classes=200, pretrained=False)
-            model.load_state_dict(checkpoint["model_state_dict"])
-            model.to(DEVICE).eval()
-            return model, True
-        except (KeyError, RuntimeError, OSError) as error:
-            st.warning(f"Could not load {checkpoint_path}: {error}")
-
-    model = build_model(config["architecture"], num_classes=200, pretrained=True)
+    if not os.path.exists(checkpoint_path):
+        raise FileNotFoundError(
+            f"Required trained checkpoint is missing: {checkpoint_path}"
+        )
+    try:
+        checkpoint = torch.load(checkpoint_path, map_location=DEVICE)
+        model = build_model(config["architecture"], num_classes=200, pretrained=False)
+        model.load_state_dict(checkpoint["model_state_dict"])
+    except (KeyError, RuntimeError, OSError) as error:
+        raise RuntimeError(f"Could not load trained checkpoint {checkpoint_path}: {error}") from error
     model.to(DEVICE).eval()
-    return model, False
+    return model
 
 
 def predict_bird(
-    input_image: Image.Image, model: torch.nn.Module
+    input_image: Image.Image, model: Optional[torch.nn.Module] = None
 ) -> Tuple[Dict[str, float], int, float]:
     """Return the top-five species, top class index, and top confidence."""
+    if model is None:
+        model = load_model("ConvNeXt-Tiny")
     image_tensor = EVAL_TRANSFORM(input_image.convert("RGB")).unsqueeze(0).to(DEVICE)
     with torch.no_grad():
         probabilities = torch.softmax(model(image_tensor), dim=1)[0].cpu().numpy()
@@ -92,13 +93,8 @@ def render_home() -> None:
         list(MODEL_CONFIGS),
         help="Scroll through the list to select the model used for classification.",
     )
-    model, has_checkpoint = load_model(model_label)
+    model = load_model(model_label)
     st.caption(f"Model: {model_label} | Device: {DEVICE.type}")
-    if not has_checkpoint:
-        st.info(
-            "No trained checkpoint was found for this model. "
-            "The ImageNet demo weights are being used."
-        )
 
     sample_paths = sorted(
         glob.glob("Test/*.jpg") + glob.glob("Test/*.jpeg") + glob.glob("Test/*.png")
