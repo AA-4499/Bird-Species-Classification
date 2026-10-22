@@ -1,0 +1,143 @@
+{
+  "model_name": "resnet50",
+  "checkpoint_path": "experiments\\runs\\resnet50\\seed_42\\best_resnet50.pth",
+  "seed": 42,
+  "training_config": {
+    "epochs": 15,
+    "batch_size": 16,
+    "lr": 0.0001,
+    "weight_decay": 0.01,
+    "label_smoothing": 0.1,
+    "drop_rate": 0.3,
+    "val_ratio": 0.15
+  },
+  "total_test_samples": 1204,
+  "top1_accuracy_pct": 80.4,
+  "average_accuracy_per_class_pct": 79.94,
+  "top_confused_pairs": [
+    {
+      "true_class_id": 48,
+      "true_name": "Boat Tailed Grackle",
+      "pred_class_id": 8,
+      "pred_name": "Brewer Blackbird",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 63,
+      "true_name": "Ring Billed Gull",
+      "pred_class_id": 61,
+      "pred_name": "Herring Gull",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 116,
+      "true_name": "Clay Colored Sparrow",
+      "pred_class_id": 114,
+      "pred_name": "Brewer Sparrow",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 140,
+      "true_name": "Artic Tern",
+      "pred_class_id": 143,
+      "pred_name": "Common Tern",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 143,
+      "true_name": "Common Tern",
+      "pred_class_id": 140,
+      "pred_name": "Artic Tern",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 183,
+      "true_name": "Louisiana Waterthrush",
+      "pred_class_id": 182,
+      "pred_name": "Northern Waterthrush",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 184,
+      "true_name": "Bohemian Waxwing",
+      "pred_class_id": 185,
+      "pred_name": "Cedar Waxwing",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 185,
+      "true_name": "Cedar Waxwing",
+      "pred_class_id": 184,
+      "pred_name": "Bohemian Waxwing",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 21,
+      "true_name": "Chuck Will Widow",
+      "pred_class_id": 104,
+      "pred_name": "Whip Poor Will",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 58,
+      "true_name": "California Gull",
+      "pred_class_id": 63,
+      "pred_name": "Ring Billed Gull",
+      "error_count": 2
+    }
+  ],
+  "lowest_5_classes": [
+    {
+      "class_id": 63,
+      "name": "Ring Billed Gull",
+      "accuracy_pct": 20.0
+    },
+    {
+      "class_id": 102,
+      "name": "Sayornis",
+      "accuracy_pct": 20.0
+    },
+    {
+      "class_id": 21,
+      "name": "Chuck Will Widow",
+      "accuracy_pct": 25.0
+    },
+    {
+      "class_id": 122,
+      "name": "Henslow Sparrow",
+      "accuracy_pct": 28.57
+    },
+    {
+      "class_id": 140,
+      "name": "Artic Tern",
+      "accuracy_pct": 28.57
+    }
+  ],
+  "highest_5_classes": [
+    {
+      "class_id": 187,
+      "name": "Pileated Woodpecker",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 188,
+      "name": "Red Bellied Woodpecker",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 190,
+      "name": "Red Headed Woodpecker",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 191,
+      "name": "Downy Woodpecker",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 198,
+      "name": "Winter Wren",
+      "accuracy_pct": 100.0
+    }
+  ]
+}

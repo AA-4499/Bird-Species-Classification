@@ -1,0 +1,69 @@
+{
+  "models": {
+    "resnet50": {
+      "runs": [
+        {
+          "seed": 42,
+          "top1_accuracy_pct": 80.4,
+          "average_accuracy_per_class_pct": 79.94,
+          "performance_path": "experiments\\runs\\resnet50\\seed_42\\test_metrics_resnet50.json"
+        },
+        {
+          "seed": 43,
+          "top1_accuracy_pct": 80.81,
+          "average_accuracy_per_class_pct": 80.07,
+          "performance_path": "experiments\\runs\\resnet50\\seed_43\\test_metrics_resnet50.json"
+        },
+        {
+          "seed": 44,
+          "top1_accuracy_pct": 80.98,
+          "average_accuracy_per_class_pct": 80.46,
+          "performance_path": "experiments\\runs\\resnet50\\seed_44\\test_metrics_resnet50.json"
+        }
+      ],
+      "top1_accuracy_pct": {
+        "mean": 80.73,
+        "std": 0.2434474618201352
+      },
+      "average_accuracy_per_class_pct": {
+        "mean": 80.15666666666665,
+        "std": 0.2209575122556861
+      }
+    },
+    "convnext_tiny": {
+      "runs": [
+        {
+          "seed": 42,
+          "top1_accuracy_pct": 89.78,
+          "average_accuracy_per_class_pct": 89.47,
+          "performance_path": "experiments\\runs\\convnext_tiny\\seed_42\\test_metrics_convnext_tiny.json"
+        },
+        {
+          "seed": 43,
+          "top1_accuracy_pct": 89.37,
+          "average_accuracy_per_class_pct": 89.16,
+          "performance_path": "experiments\\runs\\convnext_tiny\\seed_43\\test_metrics_convnext_tiny.json"
+        },
+        {
+          "seed": 44,
+          "top1_accuracy_pct": 88.7,
+          "average_accuracy_per_class_pct": 88.79,
+          "performance_path": "experiments\\runs\\convnext_tiny\\seed_44\\test_metrics_convnext_tiny.json"
+        }
+      ],
+      "top1_accuracy_pct": {
+        "mean": 89.28333333333335,
+        "std": 0.44514666746540416
+      },
+      "average_accuracy_per_class_pct": {
+        "mean": 89.14,
+        "std": 0.2779688231918553
+      }
+    }
+  },
+  "seeds": [
+    42,
+    43,
+    44
+  ]
+}

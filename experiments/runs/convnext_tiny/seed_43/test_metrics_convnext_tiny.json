@@ -1,0 +1,143 @@
+{
+  "model_name": "convnext_tiny",
+  "checkpoint_path": "experiments\\runs\\convnext_tiny\\seed_43\\best_convnext_tiny.pth",
+  "seed": 43,
+  "training_config": {
+    "epochs": 15,
+    "batch_size": 16,
+    "lr": 0.0001,
+    "weight_decay": 0.01,
+    "label_smoothing": 0.1,
+    "drop_rate": 0.3,
+    "val_ratio": 0.15
+  },
+  "total_test_samples": 1204,
+  "top1_accuracy_pct": 89.37,
+  "average_accuracy_per_class_pct": 89.16,
+  "top_confused_pairs": [
+    {
+      "true_class_id": 38,
+      "true_name": "Least Flycatcher",
+      "pred_class_id": 36,
+      "pred_name": "Acadian Flycatcher",
+      "error_count": 4
+    },
+    {
+      "true_class_id": 48,
+      "true_name": "Boat Tailed Grackle",
+      "pred_class_id": 8,
+      "pred_name": "Brewer Blackbird",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 21,
+      "true_name": "Chuck Will Widow",
+      "pred_class_id": 104,
+      "pred_name": "Whip Poor Will",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 23,
+      "true_name": "Red Faced Cormorant",
+      "pred_class_id": 24,
+      "pred_name": "Pelagic Cormorant",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 39,
+      "true_name": "Olive Sided Flycatcher",
+      "pred_class_id": 101,
+      "pred_name": "Western Wood Pewee",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 58,
+      "true_name": "California Gull",
+      "pred_class_id": 63,
+      "pred_name": "Ring Billed Gull",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 140,
+      "true_name": "Artic Tern",
+      "pred_class_id": 142,
+      "pred_name": "Caspian Tern",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 143,
+      "true_name": "Common Tern",
+      "pred_class_id": 144,
+      "pred_name": "Elegant Tern",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 143,
+      "true_name": "Common Tern",
+      "pred_class_id": 140,
+      "pred_name": "Artic Tern",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 2,
+      "true_name": "Sooty Albatross",
+      "pred_class_id": 44,
+      "pred_name": "Northern Fulmar",
+      "error_count": 1
+    }
+  ],
+  "lowest_5_classes": [
+    {
+      "class_id": 63,
+      "name": "Ring Billed Gull",
+      "accuracy_pct": 20.0
+    },
+    {
+      "class_id": 23,
+      "name": "Red Faced Cormorant",
+      "accuracy_pct": 25.0
+    },
+    {
+      "class_id": 143,
+      "name": "Common Tern",
+      "accuracy_pct": 28.57
+    },
+    {
+      "class_id": 38,
+      "name": "Least Flycatcher",
+      "accuracy_pct": 33.33
+    },
+    {
+      "class_id": 21,
+      "name": "Chuck Will Widow",
+      "accuracy_pct": 50.0
+    }
+  ],
+  "highest_5_classes": [
+    {
+      "class_id": 194,
+      "name": "Carolina Wren",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 195,
+      "name": "House Wren",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 197,
+      "name": "Rock Wren",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 198,
+      "name": "Winter Wren",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 199,
+      "name": "Common Yellowthroat",
+      "accuracy_pct": 100.0
+    }
+  ]
+}
