@@ -25,6 +25,7 @@ class_names = load_class_names(CLASS_NAMES_PATH)
 EXPERIMENT_SUMMARY_PATH = "experiments/results/multi_seed_summary.json"
 EXPERIMENT_PLOT_PATH = "experiments/results/multi_seed_comparison.png"
 PRODUCTION_SELECTION_PATH = "experiments/results/production_selection.json"
+EXPERIMENT_VISUALIZATION_DIR = "experiments/results/visualizations"
 fragment = getattr(st, "fragment", lambda function: function)
 
 
@@ -293,7 +294,7 @@ def _comparison_figure(data: pd.DataFrame, metric: str) -> go.Figure:
 
 @fragment
 def render_experiment_summary(summary: dict) -> None:
-    """Render the interactive decision summary independently from navigation."""
+    """Render interactive experiment results independently from navigation."""
     data = _experiment_dataframe(summary)
     if data.empty:
         st.warning("The experiment summary contains no completed runs.")
@@ -308,17 +309,10 @@ def render_experiment_summary(summary: dict) -> None:
         baseline_top1 = baseline["top1_accuracy_pct"]["mean"]
         production_class = production["average_accuracy_per_class_pct"]["mean"]
         baseline_class = baseline["average_accuracy_per_class_pct"]["mean"]
-        st.success(
-            "Recommendation: use fine-tuned ConvNeXt-Tiny. "
-            f"It leads fine-tuned ResNet-50 by "
-            f"{production_top1 - baseline_top1:+.2f} percentage points "
-            "on mean top-1 accuracy across three seeds."
-        )
     else:
-        st.info("Recommendation is unavailable until both fine-tuned configurations are evaluated.")
         production_top1 = baseline_top1 = production_class = baseline_class = None
 
-    st.subheader("Executive summary")
+    st.subheader("Results")
     cards = st.columns(4)
     if production_top1 is not None:
         cards[0].metric("Recommended model", "ConvNeXt-Tiny")
@@ -376,6 +370,126 @@ def render_experiment_summary(summary: dict) -> None:
                 ),
             },
         )
+
+
+def _render_experiment_setup() -> None:
+    """Explain the experiment design before showing its results."""
+    st.subheader("1. Experiment setup")
+    st.write(
+        "This experiment compares four complete training configurations for "
+        "CUB-200 bird classification. Each configuration is trained independently "
+        "with the same three random seeds to measure run-to-run variation."
+    )
+    setup_columns = st.columns(4)
+    setup_columns[0].metric("Architectures", "2")
+    setup_columns[1].metric("Training modes", "2")
+    setup_columns[2].metric("Seeds per configuration", "3")
+    setup_columns[3].metric("Epochs per run", "15")
+
+    st.markdown(
+        """
+**Configurations**
+
+- ResNet-50 — frozen features
+- ResNet-50 — fine-tuned
+- ConvNeXt-Tiny — frozen features
+- ConvNeXt-Tiny — fine-tuned
+
+**Evaluation protocol**
+
+- Dataset: CUB-200 official test set
+- Primary metrics: top-1 accuracy and average accuracy per class
+- Checkpoint selection: validation average class accuracy
+- Final evaluation: official test set, reported after checkpoint selection
+- Selection rule: best validation average class accuracy within each architecture
+        """
+    )
+    st.caption(
+        "This is a multi-seed model comparison, not a randomized online A/B test. "
+        "Error bars below represent seed-to-seed standard deviation."
+    )
+
+
+def _render_experiment_figures() -> None:
+    """Show the saved experiment figures before interactive detail."""
+    st.subheader("2. Experiment results")
+    st.write(
+        "The figures below show the aggregate result, the individual seed scores, "
+        "and the training behaviour of the validation-selected production run."
+    )
+    mean_sd_path = os.path.join(
+        EXPERIMENT_VISUALIZATION_DIR, "test_accuracy_mean_sd.png"
+    )
+    by_seed_path = os.path.join(
+        EXPERIMENT_VISUALIZATION_DIR, "test_accuracy_by_seed.png"
+    )
+    training_path = os.path.join(
+        EXPERIMENT_VISUALIZATION_DIR, "selected_run_training_curves.png"
+    )
+
+    figure_columns = st.columns(2)
+    with figure_columns[0]:
+        if os.path.exists(mean_sd_path):
+            st.image(
+                mean_sd_path,
+                caption="Mean official test performance ± standard deviation across three seeds.",
+                use_container_width=True,
+            )
+        else:
+            st.info("The mean and standard-deviation figure is not available.")
+    with figure_columns[1]:
+        if os.path.exists(by_seed_path):
+            st.image(
+                by_seed_path,
+                caption="Individual seed results with the mean and seed spread.",
+                use_container_width=True,
+            )
+        else:
+            st.info("The per-seed figure is not available.")
+
+    if os.path.exists(training_path):
+        st.image(
+            training_path,
+            caption=(
+                "Validation-selected ConvNeXt-Tiny fine-tuned run, seed 42. "
+                "The test set was used only for final evaluation."
+            ),
+            use_container_width=True,
+        )
+    else:
+        st.info("The selected-run training figure is not available.")
+
+
+def _render_experiment_conclusion(summary: dict) -> None:
+    """State the final decision after the setup and evidence."""
+    production = summary.get("architectures", {}).get("convnext_tiny", {}).get(
+        "fine_tuned"
+    )
+    baseline = summary.get("architectures", {}).get("resnet50", {}).get("fine_tuned")
+    st.subheader("4. Conclusion")
+    if not production or not baseline:
+        st.warning("A conclusion is unavailable until both fine-tuned configurations are evaluated.")
+        return
+
+    production_top1 = production["top1_accuracy_pct"]["mean"]
+    baseline_top1 = baseline["top1_accuracy_pct"]["mean"]
+    production_class = production["average_accuracy_per_class_pct"]["mean"]
+    baseline_class = baseline["average_accuracy_per_class_pct"]["mean"]
+    st.success(
+        "Conclusion: use fine-tuned ConvNeXt-Tiny as the preferred production model. "
+        f"It achieves {production_top1:.2f}% mean top-1 accuracy and "
+        f"{production_class:.2f}% mean average class accuracy across three seeds, "
+        f"versus {baseline_top1:.2f}% and {baseline_class:.2f}% for fine-tuned "
+        "ResNet-50."
+    )
+    st.write(
+        f"The improvement is {production_top1 - baseline_top1:+.2f} percentage "
+        f"points for top-1 accuracy and "
+        f"{production_class - baseline_class:+.2f} percentage points for average "
+        "class accuracy. The result is consistent across the three seeds, but "
+        "deployment should still verify latency, memory use, and difficult-class "
+        "performance."
+    )
 def render_model_page() -> None:
     """Render saved performance images and evaluation results for each model."""
     st.title("📊 Model Performance")
@@ -441,12 +555,11 @@ def render_model_page() -> None:
 
 
 def render_experiment_page() -> None:
-    """Render the decision-first aggregate experiment dashboard."""
-    st.title("🧪 Model selection dashboard")
+    """Render the experiment as setup, evidence, results, and conclusion."""
+    st.title("🧪 Multi-seed experiment")
     st.write(
-        "Choose the strongest model from independent multi-seed evaluations. "
-        "This experiment measures run-to-run variation; it does not isolate "
-        "individual training techniques."
+        "Follow the experiment from design to evidence to the final model-selection "
+        "conclusion."
     )
     if not os.path.exists(EXPERIMENT_SUMMARY_PATH):
         st.info("Experiment results are not available yet. Run `python experiment_runner.py` to create the 12 runs.")
@@ -458,7 +571,11 @@ def render_experiment_page() -> None:
         st.error(f"Could not read experiment results: {error}")
         return
 
+    _render_experiment_setup()
+    _render_experiment_figures()
+    st.subheader("3. Interactive results")
     render_experiment_summary(summary)
+    _render_experiment_conclusion(summary)
 
 
 st.set_page_config(page_title="CUB-200 Bird Classifier", page_icon="🦜", layout="wide")

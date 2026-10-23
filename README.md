@@ -173,13 +173,18 @@ continues using the current baseline checkpoints. Dedicated output directories
 ensure experiment runs never overwrite production checkpoints or `results/`
 artifacts.
 
-The Streamlit model-selection dashboard presents the recommendation first,
-followed by mean accuracy KPI cards, an interactive Plotly comparison of
-individual seed results and mean ± seed standard deviation, and an expandable
-full-results table. Training curves, per-class diagnostics, and confusion
-details remain available on the Model page. The dashboard labels seed
-variation separately from confidence intervals and distinguishes the
-validation-selected production checkpoint from the mean across runs.
+The Streamlit **Experiment** tab follows a presentation-style sequence:
+experiment setup, saved experiment result figures, interactive results, and a
+final conclusion. It explains the four configurations, three seeds, metrics,
+checkpoint-selection rule, and official test-set protocol before showing the
+mean comparison, per-seed variation, and selected-run training curves. The
+interactive section adds KPI cards, a Plotly comparison, and an expandable
+full-results table. The conclusion appears last and recommends the preferred
+production model with its measured improvement. Training curves, per-class
+diagnostics, and confusion details remain available on the Model page. The
+dashboard labels seed variation separately from confidence intervals and
+distinguishes the validation-selected production checkpoint from the mean
+across runs.
 
 ## 📊 Current Production Baseline (four-way comparison pending)
 
