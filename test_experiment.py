@@ -102,4 +102,9 @@ def test_aggregate_selects_highest_validation_run_without_touching_baseline(tmp_
     assert manifest["selection_metric"] == "best validation average class accuracy"
     assert manifest["selected"]["mode"] == "fine_tuned"
     assert manifest["selected"]["seed"] == 44
+    assert set(manifest["selected_by_model"]) == set(MODELS)
+    assert all(
+        manifest["selected_by_model"][model]["mode"] == "fine_tuned"
+        for model in MODELS
+    )
     assert baseline.read_bytes() == b"baseline"

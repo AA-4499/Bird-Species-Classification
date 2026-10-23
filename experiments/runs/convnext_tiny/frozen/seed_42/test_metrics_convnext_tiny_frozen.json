@@ -1,0 +1,145 @@
+{
+  "model_name": "convnext_tiny",
+  "checkpoint_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_42\\best_convnext_tiny.pth",
+  "seed": 42,
+  "training_config": {
+    "epochs": 15,
+    "mode": "frozen",
+    "batch_size": 16,
+    "lr": 0.0001,
+    "weight_decay": 0.01,
+    "label_smoothing": 0.1,
+    "drop_rate": 0.3,
+    "val_ratio": 0.15
+  },
+  "mode": "frozen",
+  "total_test_samples": 1204,
+  "top1_accuracy_pct": 86.71,
+  "average_accuracy_per_class_pct": 86.68,
+  "top_confused_pairs": [
+    {
+      "true_class_id": 140,
+      "true_name": "Artic Tern",
+      "pred_class_id": 143,
+      "pred_name": "Common Tern",
+      "error_count": 4
+    },
+    {
+      "true_class_id": 36,
+      "true_name": "Acadian Flycatcher",
+      "pred_class_id": 38,
+      "pred_name": "Least Flycatcher",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 143,
+      "true_name": "Common Tern",
+      "pred_class_id": 140,
+      "pred_name": "Artic Tern",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 38,
+      "true_name": "Least Flycatcher",
+      "pred_class_id": 36,
+      "pred_name": "Acadian Flycatcher",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 39,
+      "true_name": "Olive Sided Flycatcher",
+      "pred_class_id": 101,
+      "pred_name": "Western Wood Pewee",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 58,
+      "true_name": "California Gull",
+      "pred_class_id": 63,
+      "pred_name": "Ring Billed Gull",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 65,
+      "true_name": "Western Gull",
+      "pred_class_id": 58,
+      "pred_name": "California Gull",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 96,
+      "true_name": "Orchard Oriole",
+      "pred_class_id": 94,
+      "pred_name": "Baltimore Oriole",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 104,
+      "true_name": "Whip Poor Will",
+      "pred_class_id": 21,
+      "pred_name": "Chuck Will Widow",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 106,
+      "true_name": "Common Raven",
+      "pred_class_id": 28,
+      "pred_name": "American Crow",
+      "error_count": 2
+    }
+  ],
+  "lowest_5_classes": [
+    {
+      "class_id": 144,
+      "name": "Elegant Tern",
+      "accuracy_pct": 20.0
+    },
+    {
+      "class_id": 143,
+      "name": "Common Tern",
+      "accuracy_pct": 28.57
+    },
+    {
+      "class_id": 63,
+      "name": "Ring Billed Gull",
+      "accuracy_pct": 40.0
+    },
+    {
+      "class_id": 149,
+      "name": "Sage Thrasher",
+      "accuracy_pct": 40.0
+    },
+    {
+      "class_id": 140,
+      "name": "Artic Tern",
+      "accuracy_pct": 42.86
+    }
+  ],
+  "highest_5_classes": [
+    {
+      "class_id": 188,
+      "name": "Red Bellied Woodpecker",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 193,
+      "name": "Cactus Wren",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 194,
+      "name": "Carolina Wren",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 196,
+      "name": "Marsh Wren",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 199,
+      "name": "Common Yellowthroat",
+      "accuracy_pct": 100.0
+    }
+  ]
+}

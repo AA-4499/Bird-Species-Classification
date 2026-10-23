@@ -1,0 +1,145 @@
+{
+  "model_name": "convnext_tiny",
+  "checkpoint_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_42\\best_convnext_tiny.pth",
+  "seed": 42,
+  "training_config": {
+    "epochs": 15,
+    "mode": "fine_tuned",
+    "batch_size": 16,
+    "lr": 0.0001,
+    "weight_decay": 0.01,
+    "label_smoothing": 0.1,
+    "drop_rate": 0.3,
+    "val_ratio": 0.15
+  },
+  "mode": "fine_tuned",
+  "total_test_samples": 1204,
+  "top1_accuracy_pct": 89.78,
+  "average_accuracy_per_class_pct": 89.47,
+  "top_confused_pairs": [
+    {
+      "true_class_id": 111,
+      "true_name": "Great Grey Shrike",
+      "pred_class_id": 110,
+      "pred_name": "Loggerhead Shrike",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 143,
+      "true_name": "Common Tern",
+      "pred_class_id": 140,
+      "pred_name": "Artic Tern",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 21,
+      "true_name": "Chuck Will Widow",
+      "pred_class_id": 104,
+      "pred_name": "Whip Poor Will",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 36,
+      "true_name": "Acadian Flycatcher",
+      "pred_class_id": 38,
+      "pred_name": "Least Flycatcher",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 38,
+      "true_name": "Least Flycatcher",
+      "pred_class_id": 36,
+      "pred_name": "Acadian Flycatcher",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 39,
+      "true_name": "Olive Sided Flycatcher",
+      "pred_class_id": 101,
+      "pred_name": "Western Wood Pewee",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 104,
+      "true_name": "Whip Poor Will",
+      "pred_class_id": 21,
+      "pred_name": "Chuck Will Widow",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 119,
+      "true_name": "Fox Sparrow",
+      "pred_class_id": 128,
+      "pred_name": "Song Sparrow",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 140,
+      "true_name": "Artic Tern",
+      "pred_class_id": 142,
+      "pred_name": "Caspian Tern",
+      "error_count": 2
+    },
+    {
+      "true_class_id": 144,
+      "true_name": "Elegant Tern",
+      "pred_class_id": 143,
+      "pred_name": "Common Tern",
+      "error_count": 2
+    }
+  ],
+  "lowest_5_classes": [
+    {
+      "class_id": 21,
+      "name": "Chuck Will Widow",
+      "accuracy_pct": 25.0
+    },
+    {
+      "class_id": 143,
+      "name": "Common Tern",
+      "accuracy_pct": 28.57
+    },
+    {
+      "class_id": 144,
+      "name": "Elegant Tern",
+      "accuracy_pct": 40.0
+    },
+    {
+      "class_id": 23,
+      "name": "Red Faced Cormorant",
+      "accuracy_pct": 50.0
+    },
+    {
+      "class_id": 64,
+      "name": "Slaty Backed Gull",
+      "accuracy_pct": 50.0
+    }
+  ],
+  "highest_5_classes": [
+    {
+      "class_id": 192,
+      "name": "Bewick Wren",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 194,
+      "name": "Carolina Wren",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 195,
+      "name": "House Wren",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 197,
+      "name": "Rock Wren",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 199,
+      "name": "Common Yellowthroat",
+      "accuracy_pct": 100.0
+    }
+  ]
+}

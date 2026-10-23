@@ -1,0 +1,145 @@
+{
+  "model_name": "resnet50",
+  "checkpoint_path": "experiments\\runs\\resnet50\\frozen\\seed_44\\best_resnet50.pth",
+  "seed": 44,
+  "training_config": {
+    "epochs": 15,
+    "mode": "frozen",
+    "batch_size": 16,
+    "lr": 0.0001,
+    "weight_decay": 0.01,
+    "label_smoothing": 0.1,
+    "drop_rate": 0.3,
+    "val_ratio": 0.15
+  },
+  "mode": "frozen",
+  "total_test_samples": 1204,
+  "top1_accuracy_pct": 52.24,
+  "average_accuracy_per_class_pct": 51.46,
+  "top_confused_pairs": [
+    {
+      "true_class_id": 36,
+      "true_name": "Acadian Flycatcher",
+      "pred_class_id": 38,
+      "pred_name": "Least Flycatcher",
+      "error_count": 5
+    },
+    {
+      "true_class_id": 37,
+      "true_name": "Great Crested Flycatcher",
+      "pred_class_id": 38,
+      "pred_name": "Least Flycatcher",
+      "error_count": 4
+    },
+    {
+      "true_class_id": 183,
+      "true_name": "Louisiana Waterthrush",
+      "pred_class_id": 182,
+      "pred_name": "Northern Waterthrush",
+      "error_count": 4
+    },
+    {
+      "true_class_id": 38,
+      "true_name": "Least Flycatcher",
+      "pred_class_id": 36,
+      "pred_name": "Acadian Flycatcher",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 63,
+      "true_name": "Ring Billed Gull",
+      "pred_class_id": 61,
+      "pred_name": "Herring Gull",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 100,
+      "true_name": "White Pelican",
+      "pred_class_id": 99,
+      "pred_name": "Brown Pelican",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 118,
+      "true_name": "Field Sparrow",
+      "pred_class_id": 38,
+      "pred_name": "Least Flycatcher",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 140,
+      "true_name": "Artic Tern",
+      "pred_class_id": 143,
+      "pred_name": "Common Tern",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 144,
+      "true_name": "Elegant Tern",
+      "pred_class_id": 143,
+      "pred_name": "Common Tern",
+      "error_count": 3
+    },
+    {
+      "true_class_id": 166,
+      "true_name": "Hooded Warbler",
+      "pred_class_id": 167,
+      "pred_name": "Kentucky Warbler",
+      "error_count": 3
+    }
+  ],
+  "lowest_5_classes": [
+    {
+      "class_id": 21,
+      "name": "Chuck Will Widow",
+      "accuracy_pct": 0.0
+    },
+    {
+      "class_id": 28,
+      "name": "American Crow",
+      "accuracy_pct": 0.0
+    },
+    {
+      "class_id": 36,
+      "name": "Acadian Flycatcher",
+      "accuracy_pct": 0.0
+    },
+    {
+      "class_id": 38,
+      "name": "Least Flycatcher",
+      "accuracy_pct": 0.0
+    },
+    {
+      "class_id": 63,
+      "name": "Ring Billed Gull",
+      "accuracy_pct": 0.0
+    }
+  ],
+  "highest_5_classes": [
+    {
+      "class_id": 89,
+      "name": "Red Breasted Merganser",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 91,
+      "name": "Nighthawk",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 99,
+      "name": "Brown Pelican",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 105,
+      "name": "Horned Puffin",
+      "accuracy_pct": 100.0
+    },
+    {
+      "class_id": 109,
+      "name": "Geococcyx",
+      "accuracy_pct": 100.0
+    }
+  ]
+}

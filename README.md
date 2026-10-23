@@ -164,12 +164,14 @@ experiments/results/production_selection.json
 
 The local Streamlit **Experiment** page reads those aggregate artifacts and
 displays each architecture/mode seed score, mean, and standard deviation. The
-runner selects a production candidate using validation average class accuracy,
-then records the selected checkpoint's official test evaluation in
-`production_selection.json`. The local app only loads that candidate after the
-manifest is complete; otherwise it continues using the current baseline
-checkpoints. Dedicated output directories ensure experiment runs never
-overwrite production checkpoints or `results/` artifacts.
+runner selects the best production checkpoint for each architecture using
+validation average class accuracy, then records the selected checkpoints and
+their official test evaluations in `production_selection.json`. The local app
+exposes both promoted experiment models as `Production (ResNet-50)` and
+`Production (ConvNeXt-Tiny)` after the manifest is complete; otherwise it
+continues using the current baseline checkpoints. Dedicated output directories
+ensure experiment runs never overwrite production checkpoints or `results/`
+artifacts.
 
 ## 📊 Current Production Baseline (four-way comparison pending)
 

@@ -1,0 +1,15 @@
+{
+  "model": "convnext_tiny",
+  "mode": "fine_tuned",
+  "seed": 43,
+  "epochs": 15,
+  "batch_size": 16,
+  "lr": 0.0001,
+  "weight_decay": 0.01,
+  "label_smoothing": 0.1,
+  "drop_rate": 0.3,
+  "val_ratio": 0.15,
+  "checkpoint": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_43\\best_convnext_tiny.pth",
+  "history": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_43\\history_convnext_tiny.json",
+  "performance": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_43\\test_metrics_convnext_tiny_fine_tuned.json"
+}

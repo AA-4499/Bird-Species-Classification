@@ -1,0 +1,15 @@
+{
+  "model": "resnet50",
+  "mode": "fine_tuned",
+  "seed": 42,
+  "epochs": 15,
+  "batch_size": 16,
+  "lr": 0.0001,
+  "weight_decay": 0.01,
+  "label_smoothing": 0.1,
+  "drop_rate": 0.3,
+  "val_ratio": 0.15,
+  "checkpoint": "experiments\\runs\\resnet50\\fine_tuned\\seed_42\\best_resnet50.pth",
+  "history": "experiments\\runs\\resnet50\\fine_tuned\\seed_42\\history_resnet50.json",
+  "performance": "experiments\\runs\\resnet50\\fine_tuned\\seed_42\\test_metrics_resnet50_fine_tuned.json"
+}

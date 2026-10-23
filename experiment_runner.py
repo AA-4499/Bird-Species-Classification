@@ -233,10 +233,24 @@ def _write_production_selection(aggregate: Dict[str, object], results_dir: Path)
             run["top1_accuracy_pct"],
         ),
     )
+    selected_by_model = {}
+    for model in MODELS:
+        model_runs = [run for run in configurations if run["model"] == model]
+        if not model_runs:
+            raise ValueError(f"Cannot select a production checkpoint for {model}.")
+        selected_by_model[model] = max(
+            model_runs,
+            key=lambda run: (
+                run["validation_average_class_accuracy"],
+                run["average_accuracy_per_class_pct"],
+                run["top1_accuracy_pct"],
+            ),
+        )
     manifest = {
         "status": "evaluated",
         "selection_metric": aggregate["selection_metric"],
         "selected": selected,
+        "selected_by_model": selected_by_model,
         "official_test_metrics": selected["performance_path"],
         "baseline_preserved": True,
     }

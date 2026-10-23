@@ -25,35 +25,53 @@ EXPERIMENT_PLOT_PATH = "experiments/results/multi_seed_comparison.png"
 PRODUCTION_SELECTION_PATH = "experiments/results/production_selection.json"
 
 
-def _load_promoted_config() -> Optional[dict]:
-    """Use an experiment checkpoint only after its official test evaluation exists."""
-    if not os.path.exists(PRODUCTION_SELECTION_PATH):
+def _config_from_experiment_run(run: dict) -> Optional[dict]:
+    """Build an app model config from a validated experiment run."""
+    checkpoint_path = run["checkpoint_path"]
+    metrics_path = run["performance_path"]
+    if not os.path.exists(checkpoint_path) or not os.path.exists(metrics_path):
         return None
+    return {
+        "architecture": run["model"],
+        "mode": run["mode"],
+        "checkpoint": checkpoint_path,
+        "metrics": metrics_path,
+        "curves": os.path.join(
+            os.path.dirname(checkpoint_path),
+            f"curves_{run['model']}.png",
+        ),
+        "histogram": os.path.join(
+            os.path.dirname(checkpoint_path),
+            f"class_acc_hist_{run['model']}_{run['mode']}.png",
+        ),
+    }
+
+
+def _load_promoted_configs() -> Dict[str, dict]:
+    """Use the best evaluated experiment run for each architecture."""
+    promoted = {}
+    if not os.path.exists(PRODUCTION_SELECTION_PATH):
+        return promoted
     try:
         with open(PRODUCTION_SELECTION_PATH, "r", encoding="utf-8") as manifest_file:
             manifest = json.load(manifest_file)
-        selected = manifest["selected"]
-        metrics_path = manifest["official_test_metrics"]
         if manifest.get("status") != "evaluated":
-            return None
-        if not os.path.exists(selected["checkpoint_path"]) or not os.path.exists(metrics_path):
-            return None
-        return {
-            "architecture": selected["model"],
-            "mode": selected["mode"],
-            "checkpoint": selected["checkpoint_path"],
-            "metrics": metrics_path,
-            "curves": os.path.join(
-                os.path.dirname(selected["checkpoint_path"]),
-                f"curves_{selected['model']}.png",
-            ),
-            "histogram": os.path.join(
-                os.path.dirname(selected["checkpoint_path"]),
-                f"class_acc_hist_{selected['model']}_{selected['mode']}.png",
-            ),
+            return promoted
+        selected_by_model = manifest.get("selected_by_model")
+        if not selected_by_model:
+            selected = manifest["selected"]
+            selected_by_model = {selected["model"]: selected}
+        labels = {
+            "resnet50": "Production (ResNet-50)",
+            "convnext_tiny": "Production (ConvNeXt-Tiny)",
         }
+        for model, run in selected_by_model.items():
+            config = _config_from_experiment_run(run)
+            if config is not None and model in labels:
+                promoted[labels[model]] = config
+        return promoted
     except (OSError, KeyError, TypeError, json.JSONDecodeError):
-        return None
+        return promoted
 
 
 MODEL_CONFIGS = {
@@ -72,9 +90,9 @@ MODEL_CONFIGS = {
         "histogram": "results/class_acc_hist_resnet50.png",
     },
 }
-_promoted_config = _load_promoted_config()
-if _promoted_config is not None:
-    MODEL_CONFIGS = {"Production (selected)": _promoted_config, **MODEL_CONFIGS}
+_promoted_configs = _load_promoted_configs()
+if _promoted_configs:
+    MODEL_CONFIGS = {**_promoted_configs, **MODEL_CONFIGS}
 
 EVAL_TRANSFORM = transforms.Compose([
     transforms.Resize((256, 256)),
@@ -109,7 +127,10 @@ def predict_bird(
 ) -> Tuple[Dict[str, float], int, float]:
     """Return the top-five species, top class index, and top confidence."""
     if model is None:
-        model = load_model("Production (selected)" if "Production (selected)" in MODEL_CONFIGS else "ConvNeXt-Tiny")
+        default_model = "Production (ConvNeXt-Tiny)"
+        model = load_model(
+            default_model if default_model in MODEL_CONFIGS else "ConvNeXt-Tiny"
+        )
     image_tensor = EVAL_TRANSFORM(input_image.convert("RGB")).unsqueeze(0).to(DEVICE)
     with torch.no_grad():
         probabilities = torch.softmax(model(image_tensor), dim=1)[0].cpu().numpy()
