@@ -4,7 +4,7 @@
 **Student Name:** Andy Wei Jian CHU  
 **Student ID:** 104401283  
 **Subject:** COS30082 Applied Machine Learning --- Assignment 1 (20%)  
-**Hugging Face Spaces App Link:** [https://huggingface.co/spaces/AA-49/Bird-Species-Classification](https://huggingface.co/spaces/AA-49/Bird-Species-Classification)
+**Streamlit Application:** Run with `streamlit run app.py`
 
 ---
 
@@ -18,7 +18,7 @@
 | **Slide 4** | Overfitting Mitigation: Augmentation Suite & Label Smoothing | 1:15 | 5:00 |
 | **Slide 5** | Code Walkthrough: Data Pipeline, Training Loop, Evaluation | 1:45 | 6:45 |
 | **Slide 6** | Experimental Results: Top-1 vs. Average Class Accuracy & Error Analysis | 1:30 | 8:15 |
-| **Slide 7** | Live Demonstration: Gradio Web App on Hugging Face Spaces | 1:00 | 9:15 |
+| **Slide 7** | Live Demonstration: Streamlit Web Application | 1:00 | 9:15 |
 | **Slide 8** | Conclusion & Key Takeaways | 0:30 | 9:45 |
 
 ---
@@ -33,10 +33,10 @@
 - Subtitle: COS30082 Applied Machine Learning --- Assignment 1
 - Name: Andy Wei Jian CHU | Student ID: 104401283
 - University: Swinburne University of Technology
-- Logos / Badges: PyTorch, ConvNeXt, Gradio, Hugging Face
+- Logos / Badges: PyTorch, ConvNeXt, Streamlit
 
 **Spoken Script:**
-> *"Hello everyone and welcome to my presentation for COS30082 Applied Machine Learning, Assignment 1. My name is Andy Wei Jian CHU, Student ID 104401283. Today, I am presenting my project on Fine-Grained Bird Species Classification using the Caltech-UCSD Birds 200 benchmark. In this presentation, I will walk you through the fine-grained visual challenge, our comparative model design between ResNet-50 and ConvNeXt-Tiny, the strategies implemented to conquer severe overfitting, a deep dive into the source code, quantitative evaluation metrics, and finally, a live demonstration of our deployed Hugging Face web application."*
+> *"Hello everyone and welcome to my presentation for COS30082 Applied Machine Learning, Assignment 1. My name is Andy Wei Jian CHU, Student ID 104401283. Today, I am presenting my project on Fine-Grained Bird Species Classification using the Caltech-UCSD Birds 200 benchmark. In this presentation, I will walk you through the fine-grained visual challenge, our comparative model design between ResNet-50 and ConvNeXt-Tiny, the strategies implemented to conquer severe overfitting, a deep dive into the source code, quantitative evaluation metrics, and finally, a live demonstration of the integrated Streamlit web application."*
 
 ---
 
@@ -142,22 +142,17 @@
 
 ---
 
-### Slide 7: Web Application Demo on Hugging Face (8:15 - 9:15)
+### Slide 7: Integrated Streamlit Web Application Demo (8:15 - 9:15)
 **Visuals on Slide:**
-- Screen capture or live video walkthrough of the deployed Gradio UI on Hugging Face Spaces.
+- Screen capture or live video walkthrough of the Streamlit application.
 - Demonstrating:
-  - Dragging and dropping a test bird photo.
-  - Clicking 'Identify Bird Species'.
-  - Output showing Top-5 predicted probabilities with confidence bar chart and species common name.
+  - Uploading a bird photo or selecting an official test image.
+  - Clicking `Identify bird species`.
+  - Output showing the top-1 prediction, confidence, and top-five probabilities.
+  - Opening the Model and Experiment pages to show evaluation and comparison results.
 
 **Spoken Script:**
-> *"Next, let's look at the deployment deliverable. We packaged our best ConvNeXt-Tiny model into an interactive web application built with **Gradio** and deployed to **Hugging Face Spaces**.
-> 
-> Here in the interface, a user can upload any bird photograph or click on one of the pre-loaded test examples. When we click 'Identify Bird Species', the application runs the image through our model and outputs:
-> 1. The top predicted species with exact confidence percentage.
-> 2. The official CUB-200 class index.
-> 3. An interactive bar chart showing the probabilities for the top 5 most likely bird species.
-> This makes the fine-grained model accessible to ornithologists, birdwatchers, and evaluators anywhere through a simple web browser."*
+> *"Next, I will demonstrate the integrated Streamlit application. On the Home page, a user can upload a bird photograph or select an official test image. When we click `Identify bird species`, the application outputs the top predicted species, its confidence percentage, and a chart showing the five most likely species. The Model page shows the official Top-1 and average per-class accuracy. The Experiment page presents the setup, saved figures, interactive seed comparison, and final model-selection conclusion in one continuous workflow."*
 
 ---
 
@@ -167,10 +162,10 @@
   - Successfully addressed FGVC challenges on CUB-200.
   - ConvNeXt-Tiny validated as superior architecture over ResNet-50 (+6% accuracy gain).
   - Multi-tier regularization suite is measured in saved histories; no causal ablation is claimed.
-  - Complete deliverables delivered: Modular Python code, 4-page academic report, Gradio app on Hugging Face, and presentation.
-- Contact / GitHub / Hugging Face links.
+  - Complete deliverables delivered: Modular Python code, 4-page academic report, integrated Streamlit application, and presentation.
+- Contact / GitHub link.
 
 **Spoken Script:**
 > *"To conclude, this project has a documented production baseline using ConvNeXt-Tiny and a rigorous regularization suite. It achieves 89.53% Top-1 Accuracy and 89.36% Average Class Accuracy. The 12-run frozen-versus-fine-tuned comparison remains pending, and any promotion will be based on validation average class accuracy before official test evaluation.
 > 
-> Thank you very much for your time and attention. All code, checkpoints, and documentation are available in the submission repository and on Hugging Face Spaces."*
+> Thank you very much for your time and attention. All code, checkpoints, documentation, and the integrated Streamlit application are available in the submission repository."*

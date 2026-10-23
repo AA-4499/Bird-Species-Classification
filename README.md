@@ -5,7 +5,7 @@
 **Student ID:** 104401283  
 **Institution:** Swinburne University of Technology  
 **Weighting:** 20%  
-**Hugging Face Spaces Application:** [https://huggingface.co/spaces/AA-49/Bird-Species-Classification](https://huggingface.co/spaces/AA-49/Bird-Species-Classification)
+**Streamlit Application:** `streamlit run app.py`  
 
 ---
 
@@ -38,8 +38,7 @@ multi-seed experiment and are the reference for the deployed applications.
 
 ```
 Assignment1/
-├── app.py                      # Optional local Streamlit evaluation interface
-├── hf_space/app.py             # Deployed Gradio web application
+├── app.py                      # Streamlit classifier, model metrics, and experiment dashboard
 ├── requirements.txt            # Deployment and execution dependencies
 ├── dataset.py                  # PyTorch Dataset, stratified split, and data augmentation transforms
 ├── models.py                   # Model builders for ResNet-50 and ConvNeXt-Tiny
@@ -110,11 +109,17 @@ Open the displayed local URL to use the three sidebar pages:
 - **Model**: choose either model to view its saved training curves, per-class accuracy histogram, evaluation metrics, and most-confused species.
 - **Experiment**: view multi-seed results after running the experiment workflow below.
 
-### Production Deployment
-The production Gradio application is maintained in [`hf_space/`](hf_space/) and is
-available at the [deployed Hugging Face Space](https://huggingface.co/spaces/AA-49/Bird-Species-Classification).
-It requires the trained checkpoint and `data/class_names.json`; startup fails
-explicitly if either production asset is missing.
+### Production Application
+The production classifier, model evaluation, and multi-seed experiment
+dashboard are combined in the Streamlit application. Run it with:
+
+```bash
+streamlit run app.py
+```
+
+The Home page performs inference, the Model page presents official evaluation
+results, and the Experiment page presents the experiment setup, figures,
+interactive comparison, and final conclusion.
 
 ---
 
@@ -201,7 +206,7 @@ across runs.
   final YouTube recording URL before submission; it must not be fabricated.
 - **Video:** `presentation/presentation_script.md` provides an under-10-minute
   slide-by-slide plan covering the problem, data, architectures, training,
-  overfitting mitigation, code, results, Hugging Face demonstration, and
+  overfitting mitigation, code, results, Streamlit demonstration, and
   conclusion.
 
 ## 📊 Current Production Baseline (four-way comparison pending)

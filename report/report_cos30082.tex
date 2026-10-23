@@ -33,11 +33,11 @@
 \maketitle
 
 \begin{abstract}
-Fine-Grained Visual Categorization (FGVC) presents a formidable challenge in computer vision due to extremely low inter-class morphological variance across visually proximate species, compounded by large intra-class pose, lighting, and background variability. This paper investigates bird species identification on the Caltech-UCSD Birds 200 (CUB-200) benchmark (200 bird categories, 4,829 training and 1,204 testing images). To prevent catastrophic overfitting on this low-sample dataset ($\approx 24$ images/class), we establish a stratified 85/15 validation regime, domain-specific data augmentations (Random Resized Crop, Color Jitter, Random Erasing), Label Smoothing Cross-Entropy, and AdamW optimization with Cosine Annealing. We contrast a canonical baseline (\textbf{ResNet-50}) against a modernized pure convolutional architecture (\textbf{ConvNeXt-Tiny}). Experimental evaluation reveals that ConvNeXt-Tiny decisively outperforms ResNet-50, achieving an overall \textbf{Top-1 Accuracy of 89.53\%} and an \textbf{Average Accuracy per Class of 89.36\%} (an absolute gain of $+8.88\%$ and $+9.25\%$ respectively). Finally, we conduct fine-grained confusion pair analyses and deploy the optimized model as an interactive web service via Gradio on Hugging Face Spaces.
+Fine-Grained Visual Categorization (FGVC) presents a formidable challenge in computer vision due to extremely low inter-class morphological variance across visually proximate species, compounded by large intra-class pose, lighting, and background variability. This paper investigates bird species identification on the Caltech-UCSD Birds 200 (CUB-200) benchmark (200 bird categories, 4,829 training and 1,204 testing images). To prevent catastrophic overfitting on this low-sample dataset ($\approx 24$ images/class), we establish a stratified 85/15 validation regime, domain-specific data augmentations (Random Resized Crop, Color Jitter, Random Erasing), Label Smoothing Cross-Entropy, and AdamW optimization with Cosine Annealing. We contrast a canonical baseline (\textbf{ResNet-50}) against a modernized pure convolutional architecture (\textbf{ConvNeXt-Tiny}). Experimental evaluation reveals that ConvNeXt-Tiny decisively outperforms ResNet-50, achieving an overall \textbf{Top-1 Accuracy of 89.53\%} and an \textbf{Average Accuracy per Class of 89.36\%} (an absolute gain of $+8.88\%$ and $+9.25\%$ respectively). Finally, we conduct fine-grained confusion pair analyses and combine the optimized model, evaluation results, and experiment dashboard in an interactive Streamlit application.
 \end{abstract}
 
 \vspace{0.5em}
-\noindent\textbf{Hugging Face Web Application:} \url{https://huggingface.co/spaces/AA-49/Bird-Species-Classification} \\
+\noindent\textbf{Application:} Streamlit (`streamlit run app.py`) \\
 
 \section{Methodology}
 
@@ -152,11 +152,16 @@ The saved baseline evaluation reports the following directed confusions. They ar
 The saved fine-tuned histories show a final training-to-validation Top-1 gap of 15.83 percentage points for ResNet-50 (99.42% vs. 83.59%) and 11.20 points for ConvNeXt-Tiny (99.61% vs. 88.41%). These histories document runs with the stated regularization configuration; no no-augmentation/no-smoothing ablation artifacts are present to establish causal effects or support a below-7% gap claim. Frozen-versus-fine-tuned runs compare training regimes, not individual regularization components.
 
 \section{Model Deployment and Web Application}
-The current baseline checkpoints are encapsulated into an interactive web application utilizing \textbf{Gradio} and prepared for \textbf{Hugging Face Spaces}. A new checkpoint will only be promoted after the 12-run comparison selects it by validation average class accuracy and its official test evaluation is saved. The user interface provides:
+The production checkpoints, classifier, model evaluation, and experiment
+dashboard are combined into an interactive \textbf{Streamlit} application. A
+new checkpoint will only be promoted after the 12-run comparison selects it by
+validation average class accuracy and its official test evaluation is saved.
+The user interface provides:
 \begin{itemize}
-    \item Multi-source image input (upload, clipboard, webcam).
+    \item Image upload or selection of an official test image.
     \item Top-5 predicted species probability distribution with confidence metrics and clean taxonomical common names.
-    \item Bundled benchmark examples from the official test dataset for instant one-click demonstration.
+    \item Official Top-1 accuracy, average accuracy per class, class-wise results, and confusion pairs.
+    \item Experiment setup, saved figures, interactive seed comparison, and final model-selection conclusion.
 \end{itemize}
 
 \section{Conclusion}

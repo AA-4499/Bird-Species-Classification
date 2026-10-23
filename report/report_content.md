@@ -4,7 +4,7 @@
 **Student Name:** Andy Wei Jian CHU  
 **Student ID:** 104401283  
 **Institution:** Swinburne University of Technology  
-**Hugging Face Spaces Application:** [https://huggingface.co/spaces/AA-49/Bird-Species-Classification](https://huggingface.co/spaces/AA-49/Bird-Species-Classification)  
+**Application:** Streamlit (`streamlit run app.py`)  
 
 ---
 
@@ -119,12 +119,16 @@ The saved fine-tuned histories show that training accuracy continues to exceed v
 
 ## 3. Deployment & Application
 
-### 3.1 Interactive Gradio Web Application
-The current baseline checkpoints are packaged into an interactive **Gradio** web application (`app.py`). A new production checkpoint will only be promoted after the completed experiment selects it by validation average class accuracy and its official test evaluation is saved. Key capabilities include:
-- **Real-Time Multi-Modal Input:** Accepts user-uploaded high-resolution bird images, clipboard pastes, and live webcam captures.
-- **Top-5 Predicted Confidence Visualization:** Displays an interactive probability bar chart of the top 5 predicted bird species, mapped to clean, human-readable common names.
-- **Instant Demonstration:** Pre-loaded test image examples enable one-click verification for evaluators without requiring external file preparation.
-- **Hugging Face Spaces Deployment:** Packaged with `requirements.txt` and optimized for zero-GPU CPU inference or GPU acceleration on Hugging Face Spaces.
+### 3.1 Integrated Streamlit Web Application
+The production checkpoints, classifier, model evaluation, and experiment
+dashboard are combined in the Streamlit application (`app.py`). A new
+production checkpoint is promoted only after the completed experiment selects it
+by validation average class accuracy and its official test evaluation is saved.
+Key capabilities include:
+- **Image input:** Accepts a user-uploaded bird image or a selectable official test image.
+- **Top-5 prediction visualization:** Displays the top predicted species, confidence, and probability chart using clean common names.
+- **Model evaluation:** Shows official Top-1 accuracy, average accuracy per class, training curves, class-wise results, and confusion pairs.
+- **Experiment evidence:** Presents the setup, saved figures, interactive multi-seed comparison, and final production recommendation.
 
 ---
 
