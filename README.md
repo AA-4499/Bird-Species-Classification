@@ -173,6 +173,14 @@ continues using the current baseline checkpoints. Dedicated output directories
 ensure experiment runs never overwrite production checkpoints or `results/`
 artifacts.
 
+The Streamlit model-selection dashboard presents the recommendation first,
+followed by mean accuracy KPI cards, an interactive Plotly comparison of
+individual seed results and mean ± seed standard deviation, and an expandable
+full-results table. Training curves, per-class diagnostics, and confusion
+details remain available on the Model page. The dashboard labels seed
+variation separately from confidence intervals and distinguishes the
+validation-selected production checkpoint from the mean across runs.
+
 ## 📊 Current Production Baseline (four-way comparison pending)
 
 | Metric | Baseline: ResNet-50 | Advanced: ConvNeXt-Tiny | Relative Improvement |

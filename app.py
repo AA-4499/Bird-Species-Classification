@@ -5,6 +5,8 @@ import json
 import os
 from typing import Dict, Optional, Tuple
 
+import pandas as pd
+import plotly.graph_objects as go
 import streamlit as st
 import torch
 from PIL import Image
@@ -23,6 +25,7 @@ class_names = load_class_names(CLASS_NAMES_PATH)
 EXPERIMENT_SUMMARY_PATH = "experiments/results/multi_seed_summary.json"
 EXPERIMENT_PLOT_PATH = "experiments/results/multi_seed_comparison.png"
 PRODUCTION_SELECTION_PATH = "experiments/results/production_selection.json"
+fragment = getattr(st, "fragment", lambda function: function)
 
 
 def _config_from_experiment_run(run: dict) -> Optional[dict]:
@@ -194,6 +197,179 @@ def load_metrics(model_label: str) -> Optional[dict]:
     metrics_path = MODEL_CONFIGS[model_label]["metrics"]
     if not os.path.exists(metrics_path):
         return None
+
+
+@st.cache_data
+def load_experiment_summary(path: str) -> dict:
+    """Load the aggregate experiment once per artifact version."""
+    with open(path, "r", encoding="utf-8") as summary_file:
+        return json.load(summary_file)
+
+
+def _experiment_dataframe(summary: dict) -> pd.DataFrame:
+    """Flatten nested experiment results for tables and interactive charts."""
+    rows = []
+    for model, model_results in summary.get("architectures", {}).items():
+        for mode, mode_results in model_results.items():
+            for run in mode_results.get("runs", []):
+                rows.append(
+                    {
+                        "Configuration": (
+                            f"{model.replace('_', ' ').title()} / "
+                            f"{mode.replace('_', ' ').title()}"
+                        ),
+                        "Model": model,
+                        "Mode": mode,
+                        "Seed": run["seed"],
+                        "Validation average class accuracy": (
+                            run["validation_average_class_accuracy"] * 100
+                        ),
+                        "Top-1 accuracy": run["top1_accuracy_pct"],
+                        "Average class accuracy": run["average_accuracy_per_class_pct"],
+                    }
+                )
+    return pd.DataFrame(rows)
+
+
+def _comparison_figure(data: pd.DataFrame, metric: str) -> go.Figure:
+    """Create a responsive mean plus seed-level spread chart."""
+    figure = go.Figure()
+    for configuration, group in data.groupby("Configuration", sort=False):
+        figure.add_trace(
+            go.Scatter(
+                x=[configuration] * len(group),
+                y=group[metric],
+                mode="markers",
+                name=configuration,
+                legendgroup=configuration,
+                showlegend=False,
+                marker={"size": 9, "opacity": 0.65},
+                customdata=group[["Seed"]].to_numpy(),
+                hovertemplate=(
+                    "<b>%{x}</b><br>Seed: %{customdata[0]}<br>"
+                    f"{metric}: %{{y:.2f}}%<extra></extra>"
+                ),
+            )
+        )
+
+    means = data.groupby("Configuration", sort=False)[metric].agg(["mean", "std"]).reset_index()
+    figure.add_trace(
+        go.Scatter(
+            x=means["Configuration"],
+            y=means["mean"],
+            mode="markers",
+            name="Mean ± SD",
+            marker={"size": 14, "symbol": "diamond", "color": "#111827"},
+            error_y={
+                "type": "data",
+                "array": means["std"].fillna(0),
+                "visible": True,
+                "thickness": 2,
+                "width": 5,
+            },
+            hovertemplate=(
+                "<b>%{x}</b><br>Mean: %{y:.2f}%<br>"
+                "Error bars: seed SD<extra></extra>"
+            ),
+        )
+    )
+    figure.update_layout(
+        title=f"{metric}: mean, seed variation, and individual runs",
+        xaxis_title="Configuration",
+        yaxis_title=f"{metric} (%)",
+        yaxis={"range": [0, 100]},
+        hovermode="closest",
+        margin={"l": 20, "r": 20, "t": 65, "b": 100},
+        legend={"orientation": "h"},
+    )
+    return figure
+
+
+@fragment
+def render_experiment_summary(summary: dict) -> None:
+    """Render the interactive decision summary independently from navigation."""
+    data = _experiment_dataframe(summary)
+    if data.empty:
+        st.warning("The experiment summary contains no completed runs.")
+        return
+
+    production = summary.get("architectures", {}).get("convnext_tiny", {}).get(
+        "fine_tuned"
+    )
+    baseline = summary.get("architectures", {}).get("resnet50", {}).get("fine_tuned")
+    if production and baseline:
+        production_top1 = production["top1_accuracy_pct"]["mean"]
+        baseline_top1 = baseline["top1_accuracy_pct"]["mean"]
+        production_class = production["average_accuracy_per_class_pct"]["mean"]
+        baseline_class = baseline["average_accuracy_per_class_pct"]["mean"]
+        st.success(
+            "Recommendation: use fine-tuned ConvNeXt-Tiny. "
+            f"It leads fine-tuned ResNet-50 by "
+            f"{production_top1 - baseline_top1:+.2f} percentage points "
+            "on mean top-1 accuracy across three seeds."
+        )
+    else:
+        st.info("Recommendation is unavailable until both fine-tuned configurations are evaluated.")
+        production_top1 = baseline_top1 = production_class = baseline_class = None
+
+    st.subheader("Executive summary")
+    cards = st.columns(4)
+    if production_top1 is not None:
+        cards[0].metric("Recommended model", "ConvNeXt-Tiny")
+        cards[1].metric("Mean top-1 accuracy", f"{production_top1:.2f}%")
+        cards[2].metric("Mean class accuracy", f"{production_class:.2f}%")
+        cards[3].metric(
+            "Gain vs ResNet-50",
+            f"{production_top1 - baseline_top1:+.2f} pp",
+            delta=f"{production_class - baseline_class:+.2f} pp macro",
+        )
+    else:
+        cards[0].metric("Configurations", data["Configuration"].nunique())
+        cards[1].metric("Completed runs", len(data))
+        cards[2].metric("Metric", "Accuracy")
+        cards[3].metric("Seeds per configuration", data["Seed"].nunique())
+
+    st.caption(
+        "Point estimates are means across training seeds. Error bars show seed-to-seed "
+        "standard deviation, not confidence intervals."
+    )
+    metric = st.radio(
+        "Primary metric",
+        ["Top-1 accuracy", "Average class accuracy"],
+        horizontal=True,
+        key="experiment_metric",
+    )
+    st.plotly_chart(
+        _comparison_figure(data, metric),
+        use_container_width=True,
+        config={"responsive": True, "displaylogo": False},
+    )
+
+    with st.expander("Full results by seed"):
+        st.dataframe(
+            data[
+                [
+                    "Configuration",
+                    "Seed",
+                    "Validation average class accuracy",
+                    "Top-1 accuracy",
+                    "Average class accuracy",
+                ]
+            ],
+            hide_index=True,
+            use_container_width=True,
+            column_config={
+                "Validation average class accuracy": st.column_config.NumberColumn(
+                    "Validation average class accuracy (%)", format="%.2f%%"
+                ),
+                "Top-1 accuracy": st.column_config.NumberColumn(
+                    "Top-1 accuracy (%)", format="%.2f%%"
+                ),
+                "Average class accuracy": st.column_config.NumberColumn(
+                    "Average class accuracy (%)", format="%.2f%%"
+                ),
+            },
+        )
     try:
         with open(metrics_path, "r", encoding="utf-8") as metrics_file:
             return json.load(metrics_file)
@@ -267,66 +443,24 @@ def render_model_page() -> None:
 
 
 def render_experiment_page() -> None:
-    """Render aggregate results from the isolated multi-seed experiment."""
-    st.title("🧪 Multi-seed Experiment")
+    """Render the decision-first aggregate experiment dashboard."""
+    st.title("🧪 Model selection dashboard")
     st.write(
-        "Independent full-configuration runs measure run-to-run variation; "
-        "they do not isolate individual training techniques."
+        "Choose the strongest model from independent multi-seed evaluations. "
+        "This experiment measures run-to-run variation; it does not isolate "
+        "individual training techniques."
     )
     if not os.path.exists(EXPERIMENT_SUMMARY_PATH):
         st.info("Experiment results are not available yet. Run `python experiment_runner.py` to create the 12 runs.")
         return
 
     try:
-        with open(EXPERIMENT_SUMMARY_PATH, "r", encoding="utf-8") as summary_file:
-            summary = json.load(summary_file)
+        summary = load_experiment_summary(EXPERIMENT_SUMMARY_PATH)
     except (OSError, json.JSONDecodeError) as error:
         st.error(f"Could not read experiment results: {error}")
         return
 
-    for model, model_results in summary.get("architectures", {}).items():
-        st.subheader(model.replace("_", " ").title())
-        for mode, mode_results in model_results.items():
-            st.caption(mode.replace("_", " ").title())
-            metric_columns = st.columns(2)
-            top1 = mode_results["top1_accuracy_pct"]
-            average_class = mode_results["average_accuracy_per_class_pct"]
-            metric_columns[0].metric("Top-1 accuracy", f"{top1['mean']:.2f}% ± {top1['std']:.2f}%")
-            metric_columns[1].metric("Average class accuracy", f"{average_class['mean']:.2f}% ± {average_class['std']:.2f}%")
-            st.dataframe(
-                [
-                    {
-                        "Seed": run["seed"],
-                        "Validation average class accuracy": f"{run['validation_average_class_accuracy'] * 100:.2f}%",
-                        "Top-1 accuracy": f"{run['top1_accuracy_pct']:.2f}%",
-                        "Average class accuracy": f"{run['average_accuracy_per_class_pct']:.2f}%",
-                    }
-                    for run in mode_results.get("runs", [])
-                ],
-                hide_index=True,
-                use_container_width=True,
-            )
-
-    selection_path = os.path.join(os.path.dirname(EXPERIMENT_SUMMARY_PATH), "production_selection.json")
-    if os.path.exists(selection_path):
-        with open(selection_path, "r", encoding="utf-8") as selection_file:
-            selection = json.load(selection_file)
-        chosen = selection.get("selected", {})
-        st.success(
-            f"Selected production configuration: {chosen.get('model')} / "
-            f"{chosen.get('mode')} / seed {chosen.get('seed')} "
-            f"(validation average class accuracy "
-            f"{chosen.get('validation_average_class_accuracy', 0) * 100:.2f}%)."
-        )
-
-    if os.path.exists(EXPERIMENT_PLOT_PATH):
-        st.image(
-            EXPERIMENT_PLOT_PATH,
-            caption="Mean accuracy with standard deviation and individual seed scores",
-            use_container_width=True,
-        )
-    else:
-        st.info("The experiment comparison image is not available yet.")
+    render_experiment_summary(summary)
 
 
 st.set_page_config(page_title="CUB-200 Bird Classifier", page_icon="🦜", layout="wide")
