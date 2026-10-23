@@ -178,6 +178,20 @@ def render_home() -> None:
     sample_paths = sorted(
         glob.glob("Test/*.jpg") + glob.glob("Test/*.jpeg") + glob.glob("Test/*.png")
     )
+    if sample_paths:
+        st.subheader("Sample bird images")
+        st.caption(
+            "Choose one of these official test-set samples below, or upload your "
+            "own image. The selected sample can then be identified with the button."
+        )
+        sample_columns = st.columns(min(6, len(sample_paths)))
+        for index, sample_path in enumerate(sample_paths[:6]):
+            with sample_columns[index % len(sample_columns)]:
+                st.image(
+                    sample_path,
+                    caption=f"Sample {index + 1}",
+                    use_container_width=True,
+                )
     sample_choice = st.selectbox("Or choose a test image", ["None"] + sample_paths)
     uploaded_file = st.file_uploader(
         "Upload a bird photograph", type=["jpg", "jpeg", "png"]

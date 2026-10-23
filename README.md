@@ -193,7 +193,8 @@ across runs.
 
 ### Submission completeness checklist
 
-- **Website:** Home supports image upload or sample selection and reports the
+- **Website:** Home displays a gallery of official test-set sample images,
+  supports image upload or sample selection, and reports the
   top-1 species, confidence, and top-five probabilities. Model shows official
   Top-1 accuracy, average accuracy per class, training curves, class-wise
   performance, and confusion pairs. Experiment explains setup, shows saved
