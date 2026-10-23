@@ -152,13 +152,28 @@ def render_home() -> None:
     st.title("🦜 CUB-200 Bird Species Classifier")
     st.write("Upload a bird photograph to see the five most likely species.")
 
+    st.info(
+        "This application classifies images across 200 CUB-200 bird species. "
+        "Use the Model page to inspect official test performance and the "
+        "Experiment page to follow the multi-seed model comparison."
+    )
+    overview = st.columns(4)
+    overview[0].metric("Species", "200")
+    overview[1].metric("Training images", "4,829")
+    overview[2].metric("Official test images", "1,204")
+    overview[3].metric("Primary metrics", "Top-1 + macro")
+
     model_label = st.selectbox(
         "Choose a model",
         list(MODEL_CONFIGS),
         help="Scroll through the list to select the model used for classification.",
     )
     model = load_model(model_label)
-    st.caption(f"Model: {model_label} | Device: {DEVICE.type}")
+    model_config = MODEL_CONFIGS[model_label]
+    st.caption(
+        f"Model: {model_label} | Architecture: {model_config['architecture']} | "
+        f"Training mode: {model_config.get('mode', 'baseline')} | Device: {DEVICE.type}"
+    )
 
     sample_paths = sorted(
         glob.glob("Test/*.jpg") + glob.glob("Test/*.jpeg") + glob.glob("Test/*.png")
@@ -187,6 +202,10 @@ def render_home() -> None:
                 with right:
                     st.subheader("Top 5 probabilities")
                     st.bar_chart(results)
+                st.caption(
+                    "Confidence is the selected model's softmax probability. "
+                    "It is not a guarantee of correctness."
+                )
             except (RuntimeError, ValueError) as error:
                 st.error(f"Prediction failed: {error}")
     else:

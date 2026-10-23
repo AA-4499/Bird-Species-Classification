@@ -186,6 +186,24 @@ dashboard labels seed variation separately from confidence intervals and
 distinguishes the validation-selected production checkpoint from the mean
 across runs.
 
+### Submission completeness checklist
+
+- **Website:** Home supports image upload or sample selection and reports the
+  top-1 species, confidence, and top-five probabilities. Model shows official
+  Top-1 accuracy, average accuracy per class, training curves, class-wise
+  performance, and confusion pairs. Experiment explains setup, shows saved
+  figures, presents the multi-seed results, and ends with the model-selection
+  conclusion.
+- **Report:** `report/report_content.md` and
+  `report/report_cos30082.tex` contain the required Methodology and Results and
+  Discussion sections, student details, model design, loss, hyperparameters,
+  overfitting discussion, comparison, and model justification. Insert the
+  final YouTube recording URL before submission; it must not be fabricated.
+- **Video:** `presentation/presentation_script.md` provides an under-10-minute
+  slide-by-slide plan covering the problem, data, architectures, training,
+  overfitting mitigation, code, results, Hugging Face demonstration, and
+  conclusion.
+
 ## 📊 Current Production Baseline (four-way comparison pending)
 
 | Metric | Baseline: ResNet-50 | Advanced: ConvNeXt-Tiny | Relative Improvement |

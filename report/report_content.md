@@ -67,7 +67,7 @@ where $C=200$. This regularization exerts a soft penalty against overconfident p
 
 ---
 
-## 2. Result and Discussion
+## 2. Results and Discussion
 
 ### 2.1 Quantitative Evaluation on Official Test Dataset
 All models were evaluated on the official test set (`Test/` directory, `test.txt`), comprising $N = 1,204$ images spanning all 200 species. In accordance with the assignment specifications, we report two formal metrics:

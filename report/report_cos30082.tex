@@ -98,7 +98,7 @@ where $C=200$. This prevents output logits from diverging to infinity, maintaini
 \subsubsection{Optimization and Mixed Precision Scheme}
 Training is orchestrated using \textbf{AdamW} with decoupled weight decay ($\lambda = 0.01$). We employ differential learning rates: $\eta_{\text{backbone}} = 1\times 10^{-4}$ and $\eta_{\text{head}} = 5\times 10^{-4}$, scheduled via Cosine Annealing down to $\eta_{\text{min}} = 1\times 10^{-6}$. To fit within the 4GB VRAM constraint of the local NVIDIA GeForce RTX 2050 GPU, Automatic Mixed Precision (AMP FP16) was activated, cutting memory consumption to $\approx 1.8$\,GB.
 
-\section{Result and Discussion}
+\section{Results and Discussion}
 
 \subsection{Evaluation Metrics and Test Results}
 In strict adherence to the project brief, performance is reported using two required evaluation metrics on the 1,204 official test images:
