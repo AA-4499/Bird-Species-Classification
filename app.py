@@ -462,6 +462,44 @@ def _render_experiment_figures() -> None:
     seed_42_training_path = os.path.join(
         EXPERIMENT_VISUALIZATION_DIR, "seed_42_training_curves_all_models.png"
     )
+    seed_43_training_path = os.path.join(
+        EXPERIMENT_VISUALIZATION_DIR, "seed_43_training_curves_all_models.png"
+    )
+    seed_44_training_path = os.path.join(
+        EXPERIMENT_VISUALIZATION_DIR, "seed_44_training_curves_all_models.png"
+    )
+    all_seed_training_path = os.path.join(
+        EXPERIMENT_VISUALIZATION_DIR, "all_seed_training_curves_all_models.png"
+    )
+
+    st.subheader("Model comparison for seed 42")
+    experiment_summary = load_experiment_summary(EXPERIMENT_SUMMARY_PATH)
+    experiment_data = _experiment_dataframe(experiment_summary)
+    seed_42_rows = []
+    for _, row in experiment_data.iterrows():
+        if int(row["Seed"]) == 42:
+            aggregate_config = experiment_summary["architectures"][row["Model"]][row["Mode"]]
+            seed_42_rows.append(
+                {
+                    "Model": row["Model"].replace("_", " ").title().replace("Convnext", "ConvNeXt"),
+                    "Mode": row["Mode"].replace("_", " ").title(),
+                    "Top-1 accuracy (%)": aggregate_config["top1_accuracy_pct"]["mean"],
+                    "Average class accuracy (%)": aggregate_config["average_accuracy_per_class_pct"]["mean"],
+                    "Per-seed Top-1 (42)": row["Top-1 accuracy"],
+                    "Val.avg-class (%)": row["Validation average class accuracy"],
+                }
+            )
+    st.dataframe(
+        pd.DataFrame(seed_42_rows),
+        hide_index=True,
+        use_container_width=True,
+        column_config={
+            "Top-1 accuracy (%)": st.column_config.NumberColumn(format="%.2f%%"),
+            "Average class accuracy (%)": st.column_config.NumberColumn(format="%.2f%%"),
+            "Per-seed Top-1 (42)": st.column_config.NumberColumn(format="%.2f%%"),
+            "Val.avg-class (%)": st.column_config.NumberColumn(format="%.2f%%"),
+        },
+    )
 
     if os.path.exists(seed_42_training_path):
         st.image(
@@ -477,6 +515,21 @@ def _render_experiment_figures() -> None:
         st.info(
             "The combined seed-42 training-curves figure is not available. "
             "Regenerate experiment results to create it."
+        )
+
+    for seed, training_path in ((43, seed_43_training_path), (44, seed_44_training_path)):
+        if os.path.exists(training_path):
+            st.image(
+                training_path,
+                caption=f"Combined training curves for all four configurations using seed {seed}.",
+                use_container_width=True,
+            )
+
+    if os.path.exists(all_seed_training_path):
+        st.image(
+            all_seed_training_path,
+            caption="Combined training curves for all four configurations across seeds 42, 43, and 44.",
+            use_container_width=True,
         )
 
     figure_columns = st.columns(2)

@@ -175,6 +175,8 @@ experiments/results/visualizations/seed_42_training_curves_all_models.png
 
 It compares training/validation loss and validation Top-1/average-class
 accuracy for ResNet-50 and ConvNeXt-Tiny in both frozen and fine-tuned modes.
+It also provides equivalent figures for seed 43, seed 44, and a combined
+all-seed comparison, together with a seed-42 model-performance table.
 
 The local Streamlit **Experiment** page reads those aggregate artifacts and
 displays each architecture/mode seed score, mean, and standard deviation. The
