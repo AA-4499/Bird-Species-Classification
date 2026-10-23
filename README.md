@@ -28,6 +28,11 @@ The system addresses the core challenge of **Fine-Grained Visual Categorization 
 
 ---
 
+## Pre-Setting
+Make sure the datasets: Train.zipDownload Train.zip, Test.zipDownload Test.zip. train.txtDownload train.txt, test.txt
+Are inside the Folder before run the code
+
+
 ## Production
 
 The production record uses the existing checkpoints and evaluation JSONs in
