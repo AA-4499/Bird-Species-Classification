@@ -459,6 +459,25 @@ def _render_experiment_figures() -> None:
     training_path = os.path.join(
         EXPERIMENT_VISUALIZATION_DIR, "selected_run_training_curves.png"
     )
+    seed_42_training_path = os.path.join(
+        EXPERIMENT_VISUALIZATION_DIR, "seed_42_training_curves_all_models.png"
+    )
+
+    if os.path.exists(seed_42_training_path):
+        st.image(
+            seed_42_training_path,
+            caption=(
+                "Combined training curves for all four model configurations using "
+                "seed 42. Solid lines show training or Top-1 validation metrics; "
+                "dashed lines show validation loss or average class accuracy."
+            ),
+            use_container_width=True,
+        )
+    else:
+        st.info(
+            "The combined seed-42 training-curves figure is not available. "
+            "Regenerate experiment results to create it."
+        )
 
     figure_columns = st.columns(2)
     with figure_columns[0]:

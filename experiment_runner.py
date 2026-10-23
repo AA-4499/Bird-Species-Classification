@@ -206,6 +206,11 @@ def aggregate_results(
     aggregate_path = results_dir / "multi_seed_summary.json"
     aggregate_path.write_text(json.dumps(aggregate, indent=2), encoding="utf-8")
     _plot_results(plot_data, results_dir / "multi_seed_comparison.png")
+    _plot_seed_training_curves(
+        root,
+        results_dir / "seed_42_training_curves_all_models.png",
+        seed=42,
+    )
     _write_production_selection(aggregate, results_dir)
     return aggregate
 
@@ -291,6 +296,67 @@ def _plot_results(data: Dict[str, tuple], path: Path) -> None:
     ax.set_ylim(0, 100)
     ax.grid(axis="y", linestyle=":", alpha=0.5)
     ax.legend()
+    fig.tight_layout()
+    fig.savefig(path, dpi=200)
+    plt.close(fig)
+
+
+def _plot_seed_training_curves(root: Path, path: Path, seed: int) -> None:
+    """Plot loss and validation metrics for every configuration at one seed."""
+    configurations = (
+        ("resnet50", "frozen", "ResNet-50 / Frozen"),
+        ("resnet50", "fine_tuned", "ResNet-50 / Fine-tuned"),
+        ("convnext_tiny", "frozen", "ConvNeXt-Tiny / Frozen"),
+        ("convnext_tiny", "fine_tuned", "ConvNeXt-Tiny / Fine-tuned"),
+    )
+    fig, axes = plt.subplots(2, 1, figsize=(16, 10), sharex=True)
+    loss_axis, accuracy_axis = axes
+    colors = ("#2563eb", "#dc2626", "#059669", "#7c3aed")
+
+    for (model, mode, label), color in zip(configurations, colors):
+        history_path = run_directory(root, model, mode, seed) / f"history_{model}.json"
+        if not history_path.exists():
+            plt.close(fig)
+            return
+        payload = json.loads(history_path.read_text(encoding="utf-8"))
+        history = payload.get("history", {})
+        epochs = np.arange(1, len(history.get("train_loss", [])) + 1)
+        required_keys = ("val_loss", "val_top1", "val_ave_class")
+        if len(epochs) == 0 or any(len(history.get(key, [])) != len(epochs) for key in required_keys):
+            plt.close(fig)
+            return
+
+        loss_axis.plot(
+            epochs, history["train_loss"], color=color, linestyle="-", label=f"{label} train"
+        )
+        loss_axis.plot(
+            epochs, history["val_loss"], color=color, linestyle="--", label=f"{label} val"
+        )
+        accuracy_axis.plot(
+            epochs,
+            np.asarray(history["val_top1"]) * 100,
+            color=color,
+            linestyle="-",
+            label=f"{label} Top-1",
+        )
+        accuracy_axis.plot(
+            epochs,
+            np.asarray(history["val_ave_class"]) * 100,
+            color=color,
+            linestyle="--",
+            label=f"{label} Avg class",
+        )
+
+    loss_axis.set_title(f"Seed {seed}: Training and validation loss")
+    loss_axis.set_ylabel("Loss")
+    accuracy_axis.set_title(f"Seed {seed}: Validation accuracy")
+    accuracy_axis.set_ylabel("Accuracy (%)")
+    for axis in axes.flat:
+        axis.set_xlabel("Epoch")
+        axis.grid(True, linestyle=":", alpha=0.5)
+        axis.legend(fontsize=8, ncol=2)
+    accuracy_axis.set_ylim(0, 100)
+    fig.suptitle(f"All experiment configurations: seed {seed}", fontsize=16, fontweight="bold")
     fig.tight_layout()
     fig.savefig(path, dpi=200)
     plt.close(fig)

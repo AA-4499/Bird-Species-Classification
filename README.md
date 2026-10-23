@@ -167,6 +167,15 @@ experiments/results/multi_seed_comparison.png
 experiments/results/production_selection.json
 ```
 
+The Experiment page also shows the combined seed-42 training-curves figure:
+
+```text
+experiments/results/visualizations/seed_42_training_curves_all_models.png
+```
+
+It compares training/validation loss and validation Top-1/average-class
+accuracy for ResNet-50 and ConvNeXt-Tiny in both frozen and fine-tuned modes.
+
 The local Streamlit **Experiment** page reads those aggregate artifacts and
 displays each architecture/mode seed score, mean, and standard deviation. The
 runner selects the best production checkpoint for each architecture using
