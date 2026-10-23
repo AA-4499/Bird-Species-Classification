@@ -34,6 +34,7 @@ def evaluate_checkpoint(
     batch_size: int = 32,
     device: str = "cuda",
     output_dir: str = "results",
+    result_name: str = None,
 ):
     """Run full evaluation on official test dataset using a trained checkpoint."""
     device = torch.device(device if torch.cuda.is_available() else "cpu")
@@ -42,9 +43,11 @@ def evaluate_checkpoint(
     # 1. Load Checkpoint
     checkpoint = torch.load(checkpoint_path, map_location=device)
     model_name = checkpoint.get("model_name", "convnext_tiny")
+    training_config = checkpoint.get("training_config", {})
+    fine_tune = training_config.get("mode", "fine_tuned") == "fine_tuned"
     
     # 2. Build Model & Load Weights
-    model = build_model(model_name=model_name, num_classes=200, pretrained=False)
+    model = build_model(model_name=model_name, num_classes=200, pretrained=False, fine_tune=fine_tune)
     model.load_state_dict(checkpoint["model_state_dict"])
     model.to(device)
     model.eval()
@@ -121,6 +124,7 @@ def evaluate_checkpoint(
         "checkpoint_path": checkpoint_path,
         "seed": checkpoint.get("seed"),
         "training_config": checkpoint.get("training_config", {}),
+        "mode": training_config.get("mode", "fine_tuned"),
         "total_test_samples": len(all_targets),
         "top1_accuracy_pct": float(round(top1_acc * 100, 2)),
         "average_accuracy_per_class_pct": float(round(ave_class_acc * 100, 2)),
@@ -130,7 +134,8 @@ def evaluate_checkpoint(
     }
 
     os.makedirs(output_dir, exist_ok=True)
-    out_json = os.path.join(output_dir, f"test_metrics_{model_name}.json")
+    result_stem = result_name or model_name
+    out_json = os.path.join(output_dir, f"test_metrics_{result_stem}.json")
     with open(out_json, "w", encoding="utf-8") as f:
         json.dump(results_payload, f, indent=2)
     print(f"[INFO] Saved test metrics to {out_json}")
@@ -144,7 +149,7 @@ def evaluate_checkpoint(
     ax.set_ylabel("Number of Species (out of 200)", fontsize=11)
     ax.grid(True, linestyle=":", alpha=0.6)
     plt.tight_layout()
-    hist_plot_path = os.path.join(output_dir, f"class_acc_hist_{model_name}.png")
+    hist_plot_path = os.path.join(output_dir, f"class_acc_hist_{result_stem}.png")
     plt.savefig(hist_plot_path, dpi=300)
     plt.close()
     print(f"[INFO] Saved histogram to {hist_plot_path}")
@@ -159,6 +164,8 @@ def main():
     parser.add_argument("--test_txt", type=str, default="test.txt", help="Path to test.txt annotation")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for inference")
     parser.add_argument("--output_dir", type=str, default="results", help="Directory for evaluation artifacts")
+    parser.add_argument("--result_name", type=str, default=None,
+                        help="Optional result filename stem for isolated experiment modes")
     args = parser.parse_args()
 
     evaluate_checkpoint(
@@ -167,6 +174,7 @@ def main():
         test_txt=args.test_txt,
         batch_size=args.batch_size,
         output_dir=args.output_dir,
+        result_name=args.result_name,
     )
 
 

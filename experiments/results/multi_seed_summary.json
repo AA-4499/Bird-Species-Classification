@@ -1,69 +1,348 @@
 {
-  "models": {
+  "architectures": {
     "resnet50": {
-      "runs": [
-        {
-          "seed": 42,
-          "top1_accuracy_pct": 80.4,
-          "average_accuracy_per_class_pct": 79.94,
-          "performance_path": "experiments\\runs\\resnet50\\seed_42\\test_metrics_resnet50.json"
+      "frozen": {
+        "runs": [
+          {
+            "seed": 42,
+            "model": "resnet50",
+            "mode": "frozen",
+            "validation_average_class_accuracy": 0.52125,
+            "top1_accuracy_pct": 50.75,
+            "average_accuracy_per_class_pct": 49.77,
+            "checkpoint_path": "experiments\\runs\\resnet50\\frozen\\seed_42\\best_resnet50.pth",
+            "history_path": "experiments\\runs\\resnet50\\frozen\\seed_42\\history_resnet50.json",
+            "performance_path": "experiments\\runs\\resnet50\\frozen\\seed_42\\test_metrics_resnet50_frozen.json"
+          },
+          {
+            "seed": 43,
+            "model": "resnet50",
+            "mode": "frozen",
+            "validation_average_class_accuracy": 0.5395833333333333,
+            "top1_accuracy_pct": 50.66,
+            "average_accuracy_per_class_pct": 49.75,
+            "checkpoint_path": "experiments\\runs\\resnet50\\frozen\\seed_43\\best_resnet50.pth",
+            "history_path": "experiments\\runs\\resnet50\\frozen\\seed_43\\history_resnet50.json",
+            "performance_path": "experiments\\runs\\resnet50\\frozen\\seed_43\\test_metrics_resnet50_frozen.json"
+          },
+          {
+            "seed": 44,
+            "model": "resnet50",
+            "mode": "frozen",
+            "validation_average_class_accuracy": 0.52075,
+            "top1_accuracy_pct": 52.24,
+            "average_accuracy_per_class_pct": 51.46,
+            "checkpoint_path": "experiments\\runs\\resnet50\\frozen\\seed_44\\best_resnet50.pth",
+            "history_path": "experiments\\runs\\resnet50\\frozen\\seed_44\\history_resnet50.json",
+            "performance_path": "experiments\\runs\\resnet50\\frozen\\seed_44\\test_metrics_resnet50_frozen.json"
+          }
+        ],
+        "top1_accuracy_pct": {
+          "mean": 51.21666666666667,
+          "std": 0.7245381670799393
         },
-        {
-          "seed": 43,
-          "top1_accuracy_pct": 80.81,
-          "average_accuracy_per_class_pct": 80.07,
-          "performance_path": "experiments\\runs\\resnet50\\seed_43\\test_metrics_resnet50.json"
+        "average_accuracy_per_class_pct": {
+          "mean": 50.326666666666675,
+          "std": 0.8014292787819075
         },
-        {
-          "seed": 44,
-          "top1_accuracy_pct": 80.98,
-          "average_accuracy_per_class_pct": 80.46,
-          "performance_path": "experiments\\runs\\resnet50\\seed_44\\test_metrics_resnet50.json"
+        "validation_average_class_accuracy": {
+          "mean": 0.5271944444444444,
+          "std": 0.008762645183806289
         }
-      ],
-      "top1_accuracy_pct": {
-        "mean": 80.73,
-        "std": 0.2434474618201352
       },
-      "average_accuracy_per_class_pct": {
-        "mean": 80.15666666666665,
-        "std": 0.2209575122556861
+      "fine_tuned": {
+        "runs": [
+          {
+            "seed": 42,
+            "model": "resnet50",
+            "mode": "fine_tuned",
+            "validation_average_class_accuracy": 0.8244166666666666,
+            "top1_accuracy_pct": 80.4,
+            "average_accuracy_per_class_pct": 79.94,
+            "checkpoint_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_42\\best_resnet50.pth",
+            "history_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_42\\history_resnet50.json",
+            "performance_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_42\\test_metrics_resnet50_fine_tuned.json"
+          },
+          {
+            "seed": 43,
+            "model": "resnet50",
+            "mode": "fine_tuned",
+            "validation_average_class_accuracy": 0.8130833333333334,
+            "top1_accuracy_pct": 80.81,
+            "average_accuracy_per_class_pct": 80.07,
+            "checkpoint_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_43\\best_resnet50.pth",
+            "history_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_43\\history_resnet50.json",
+            "performance_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_43\\test_metrics_resnet50_fine_tuned.json"
+          },
+          {
+            "seed": 44,
+            "model": "resnet50",
+            "mode": "fine_tuned",
+            "validation_average_class_accuracy": 0.8167499999999999,
+            "top1_accuracy_pct": 80.98,
+            "average_accuracy_per_class_pct": 80.46,
+            "checkpoint_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_44\\best_resnet50.pth",
+            "history_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_44\\history_resnet50.json",
+            "performance_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_44\\test_metrics_resnet50_fine_tuned.json"
+          }
+        ],
+        "top1_accuracy_pct": {
+          "mean": 80.73,
+          "std": 0.2434474618201352
+        },
+        "average_accuracy_per_class_pct": {
+          "mean": 80.15666666666665,
+          "std": 0.2209575122556861
+        },
+        "validation_average_class_accuracy": {
+          "mean": 0.8180833333333334,
+          "std": 0.004721895413527907
+        }
       }
     },
     "convnext_tiny": {
-      "runs": [
-        {
-          "seed": 42,
-          "top1_accuracy_pct": 89.78,
-          "average_accuracy_per_class_pct": 89.47,
-          "performance_path": "experiments\\runs\\convnext_tiny\\seed_42\\test_metrics_convnext_tiny.json"
+      "frozen": {
+        "runs": [
+          {
+            "seed": 42,
+            "model": "convnext_tiny",
+            "mode": "frozen",
+            "validation_average_class_accuracy": 0.8646666666666667,
+            "top1_accuracy_pct": 86.71,
+            "average_accuracy_per_class_pct": 86.68,
+            "checkpoint_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_42\\best_convnext_tiny.pth",
+            "history_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_42\\history_convnext_tiny.json",
+            "performance_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_42\\test_metrics_convnext_tiny_frozen.json"
+          },
+          {
+            "seed": 43,
+            "model": "convnext_tiny",
+            "mode": "frozen",
+            "validation_average_class_accuracy": 0.8646666666666667,
+            "top1_accuracy_pct": 86.54,
+            "average_accuracy_per_class_pct": 86.23,
+            "checkpoint_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_43\\best_convnext_tiny.pth",
+            "history_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_43\\history_convnext_tiny.json",
+            "performance_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_43\\test_metrics_convnext_tiny_frozen.json"
+          },
+          {
+            "seed": 44,
+            "model": "convnext_tiny",
+            "mode": "frozen",
+            "validation_average_class_accuracy": 0.8630833333333334,
+            "top1_accuracy_pct": 86.38,
+            "average_accuracy_per_class_pct": 86.27,
+            "checkpoint_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_44\\best_convnext_tiny.pth",
+            "history_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_44\\history_convnext_tiny.json",
+            "performance_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_44\\test_metrics_convnext_tiny_frozen.json"
+          }
+        ],
+        "top1_accuracy_pct": {
+          "mean": 86.54333333333334,
+          "std": 0.13474255287605078
         },
-        {
-          "seed": 43,
-          "top1_accuracy_pct": 89.37,
-          "average_accuracy_per_class_pct": 89.16,
-          "performance_path": "experiments\\runs\\convnext_tiny\\seed_43\\test_metrics_convnext_tiny.json"
+        "average_accuracy_per_class_pct": {
+          "mean": 86.39333333333333,
+          "std": 0.20336065390226485
         },
-        {
-          "seed": 44,
-          "top1_accuracy_pct": 88.7,
-          "average_accuracy_per_class_pct": 88.79,
-          "performance_path": "experiments\\runs\\convnext_tiny\\seed_44\\test_metrics_convnext_tiny.json"
+        "validation_average_class_accuracy": {
+          "mean": 0.8641388888888889,
+          "std": 0.0007463904912524369
         }
-      ],
-      "top1_accuracy_pct": {
-        "mean": 89.28333333333335,
-        "std": 0.44514666746540416
       },
-      "average_accuracy_per_class_pct": {
-        "mean": 89.14,
-        "std": 0.2779688231918553
+      "fine_tuned": {
+        "runs": [
+          {
+            "seed": 42,
+            "model": "convnext_tiny",
+            "mode": "fine_tuned",
+            "validation_average_class_accuracy": 0.9053333333333333,
+            "top1_accuracy_pct": 89.78,
+            "average_accuracy_per_class_pct": 89.47,
+            "checkpoint_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_42\\best_convnext_tiny.pth",
+            "history_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_42\\history_convnext_tiny.json",
+            "performance_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_42\\test_metrics_convnext_tiny_fine_tuned.json"
+          },
+          {
+            "seed": 43,
+            "model": "convnext_tiny",
+            "mode": "fine_tuned",
+            "validation_average_class_accuracy": 0.8865833333333333,
+            "top1_accuracy_pct": 89.37,
+            "average_accuracy_per_class_pct": 89.16,
+            "checkpoint_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_43\\best_convnext_tiny.pth",
+            "history_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_43\\history_convnext_tiny.json",
+            "performance_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_43\\test_metrics_convnext_tiny_fine_tuned.json"
+          },
+          {
+            "seed": 44,
+            "model": "convnext_tiny",
+            "mode": "fine_tuned",
+            "validation_average_class_accuracy": 0.8773333333333333,
+            "top1_accuracy_pct": 88.7,
+            "average_accuracy_per_class_pct": 88.79,
+            "checkpoint_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_44\\best_convnext_tiny.pth",
+            "history_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_44\\history_convnext_tiny.json",
+            "performance_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_44\\test_metrics_convnext_tiny_fine_tuned.json"
+          }
+        ],
+        "top1_accuracy_pct": {
+          "mean": 89.28333333333335,
+          "std": 0.44514666746540416
+        },
+        "average_accuracy_per_class_pct": {
+          "mean": 89.14,
+          "std": 0.2779688231918553
+        },
+        "validation_average_class_accuracy": {
+          "mean": 0.8897499999999999,
+          "std": 0.011648199670144561
+        }
       }
     }
   },
+  "configurations": [
+    {
+      "seed": 42,
+      "model": "resnet50",
+      "mode": "frozen",
+      "validation_average_class_accuracy": 0.52125,
+      "top1_accuracy_pct": 50.75,
+      "average_accuracy_per_class_pct": 49.77,
+      "checkpoint_path": "experiments\\runs\\resnet50\\frozen\\seed_42\\best_resnet50.pth",
+      "history_path": "experiments\\runs\\resnet50\\frozen\\seed_42\\history_resnet50.json",
+      "performance_path": "experiments\\runs\\resnet50\\frozen\\seed_42\\test_metrics_resnet50_frozen.json"
+    },
+    {
+      "seed": 43,
+      "model": "resnet50",
+      "mode": "frozen",
+      "validation_average_class_accuracy": 0.5395833333333333,
+      "top1_accuracy_pct": 50.66,
+      "average_accuracy_per_class_pct": 49.75,
+      "checkpoint_path": "experiments\\runs\\resnet50\\frozen\\seed_43\\best_resnet50.pth",
+      "history_path": "experiments\\runs\\resnet50\\frozen\\seed_43\\history_resnet50.json",
+      "performance_path": "experiments\\runs\\resnet50\\frozen\\seed_43\\test_metrics_resnet50_frozen.json"
+    },
+    {
+      "seed": 44,
+      "model": "resnet50",
+      "mode": "frozen",
+      "validation_average_class_accuracy": 0.52075,
+      "top1_accuracy_pct": 52.24,
+      "average_accuracy_per_class_pct": 51.46,
+      "checkpoint_path": "experiments\\runs\\resnet50\\frozen\\seed_44\\best_resnet50.pth",
+      "history_path": "experiments\\runs\\resnet50\\frozen\\seed_44\\history_resnet50.json",
+      "performance_path": "experiments\\runs\\resnet50\\frozen\\seed_44\\test_metrics_resnet50_frozen.json"
+    },
+    {
+      "seed": 42,
+      "model": "resnet50",
+      "mode": "fine_tuned",
+      "validation_average_class_accuracy": 0.8244166666666666,
+      "top1_accuracy_pct": 80.4,
+      "average_accuracy_per_class_pct": 79.94,
+      "checkpoint_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_42\\best_resnet50.pth",
+      "history_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_42\\history_resnet50.json",
+      "performance_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_42\\test_metrics_resnet50_fine_tuned.json"
+    },
+    {
+      "seed": 43,
+      "model": "resnet50",
+      "mode": "fine_tuned",
+      "validation_average_class_accuracy": 0.8130833333333334,
+      "top1_accuracy_pct": 80.81,
+      "average_accuracy_per_class_pct": 80.07,
+      "checkpoint_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_43\\best_resnet50.pth",
+      "history_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_43\\history_resnet50.json",
+      "performance_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_43\\test_metrics_resnet50_fine_tuned.json"
+    },
+    {
+      "seed": 44,
+      "model": "resnet50",
+      "mode": "fine_tuned",
+      "validation_average_class_accuracy": 0.8167499999999999,
+      "top1_accuracy_pct": 80.98,
+      "average_accuracy_per_class_pct": 80.46,
+      "checkpoint_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_44\\best_resnet50.pth",
+      "history_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_44\\history_resnet50.json",
+      "performance_path": "experiments\\runs\\resnet50\\fine_tuned\\seed_44\\test_metrics_resnet50_fine_tuned.json"
+    },
+    {
+      "seed": 42,
+      "model": "convnext_tiny",
+      "mode": "frozen",
+      "validation_average_class_accuracy": 0.8646666666666667,
+      "top1_accuracy_pct": 86.71,
+      "average_accuracy_per_class_pct": 86.68,
+      "checkpoint_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_42\\best_convnext_tiny.pth",
+      "history_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_42\\history_convnext_tiny.json",
+      "performance_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_42\\test_metrics_convnext_tiny_frozen.json"
+    },
+    {
+      "seed": 43,
+      "model": "convnext_tiny",
+      "mode": "frozen",
+      "validation_average_class_accuracy": 0.8646666666666667,
+      "top1_accuracy_pct": 86.54,
+      "average_accuracy_per_class_pct": 86.23,
+      "checkpoint_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_43\\best_convnext_tiny.pth",
+      "history_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_43\\history_convnext_tiny.json",
+      "performance_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_43\\test_metrics_convnext_tiny_frozen.json"
+    },
+    {
+      "seed": 44,
+      "model": "convnext_tiny",
+      "mode": "frozen",
+      "validation_average_class_accuracy": 0.8630833333333334,
+      "top1_accuracy_pct": 86.38,
+      "average_accuracy_per_class_pct": 86.27,
+      "checkpoint_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_44\\best_convnext_tiny.pth",
+      "history_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_44\\history_convnext_tiny.json",
+      "performance_path": "experiments\\runs\\convnext_tiny\\frozen\\seed_44\\test_metrics_convnext_tiny_frozen.json"
+    },
+    {
+      "seed": 42,
+      "model": "convnext_tiny",
+      "mode": "fine_tuned",
+      "validation_average_class_accuracy": 0.9053333333333333,
+      "top1_accuracy_pct": 89.78,
+      "average_accuracy_per_class_pct": 89.47,
+      "checkpoint_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_42\\best_convnext_tiny.pth",
+      "history_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_42\\history_convnext_tiny.json",
+      "performance_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_42\\test_metrics_convnext_tiny_fine_tuned.json"
+    },
+    {
+      "seed": 43,
+      "model": "convnext_tiny",
+      "mode": "fine_tuned",
+      "validation_average_class_accuracy": 0.8865833333333333,
+      "top1_accuracy_pct": 89.37,
+      "average_accuracy_per_class_pct": 89.16,
+      "checkpoint_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_43\\best_convnext_tiny.pth",
+      "history_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_43\\history_convnext_tiny.json",
+      "performance_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_43\\test_metrics_convnext_tiny_fine_tuned.json"
+    },
+    {
+      "seed": 44,
+      "model": "convnext_tiny",
+      "mode": "fine_tuned",
+      "validation_average_class_accuracy": 0.8773333333333333,
+      "top1_accuracy_pct": 88.7,
+      "average_accuracy_per_class_pct": 88.79,
+      "checkpoint_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_44\\best_convnext_tiny.pth",
+      "history_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_44\\history_convnext_tiny.json",
+      "performance_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_44\\test_metrics_convnext_tiny_fine_tuned.json"
+    }
+  ],
   "seeds": [
     42,
     43,
     44
-  ]
+  ],
+  "modes": [
+    "frozen",
+    "fine_tuned"
+  ],
+  "selection_metric": "best validation average class accuracy"
 }

@@ -21,14 +21,17 @@ To resolve these challenges, we design an end-to-end transfer learning framework
 
 ### 1.2 Model Architectures
 
-#### Baseline Model: ResNet-50 (Residual Learning)
+#### Architecture Comparison: ResNet-50 and ConvNeXt-Tiny
+We compare two pretrained architectures (ResNet-50 and ConvNeXt-Tiny) under two training regimes: (1) a frozen feature extractor, where only the new 200-class classifier head is trained, and (2) end-to-end fine-tuning, where the backbone and head are trained with differential learning rates. This yields four architecture/regime combinations and supports both within-architecture comparisons (frozen vs. fine-tuned) and cross-architecture comparisons (ResNet-50 vs. ConvNeXt-Tiny at each regime). The existing production results below are fine-tuned model results; frozen-regime results must be populated from the new experiment before making claims about which regime performs best.
+
+#### ResNet-50 (Residual Learning)
 As a robust baseline, we employ **ResNet-50** (He et al., 2016), pre-trained on ImageNet-1K. ResNet utilizes identity skip connections to circumvent vanishing gradient phenomena across deep convolutional hierarchies:
 $$\mathbf{y} = \mathcal{F}(\mathbf{x}, \{W_i\}) + \mathbf{x}$$
 The network consists of four sequential residual stages with bottleneck building blocks ($1\times1$, $3\times3$, $1\times1$ convolutions), culminating in a 2048-dimensional feature representation following Global Average Pooling (GAP). To adapt the backbone for CUB-200, the original 1000-way linear classifier was detached and replaced with a fine-grained classification head:
 $$\mathbf{z} = \mathbf{W}_{\text{head}} \cdot \text{Dropout}_{p=0.3}(\text{GAP}(\mathbf{F})) + \mathbf{b}_{\text{head}}$$
 where $\mathbf{W}_{\text{head}} \in \mathbb{R}^{200 \times 2048}$. While ResNet-50 offers dependable representation capability, its standard $3\times3$ kernel structure exhibits a constrained effective receptive field early in the network, restricting its capacity to correlate distant bird attributes (e.g., matching bill shape with tail plumage).
 
-#### Advanced Model: ConvNeXt-Tiny (Modernized Pure Convolutional Network)
+#### ConvNeXt-Tiny (Modernized Pure Convolutional Network)
 To surpass standard CNN limitations while avoiding the quadratic memory overhead of pure Vision Transformers, we introduce **ConvNeXt-Tiny** (Liu et al., CVPR 2022). ConvNeXt modernizes traditional ConvNets by incorporating pivotal architectural innovations from the Swin Transformer:
 1. **Macro Design & Inverted Bottleneck:** Inversion of bottleneck channel dimensions (channel expansion ratio of 4 in intermediate layers) prevents information bottlenecks when processing intricate feather patterns.
 2. **Large Receptive Field with Depthwise Convolutions:** By adopting $7\times7$ depthwise convolutions in place of $3\times3$ spatial filters, ConvNeXt dramatically expands its effective receptive field from the lowest stage, allowing simultaneous capture of macro body shape and subtle localized markings.
@@ -88,7 +91,7 @@ where $T_i$ is the accuracy achieved across test samples belonging to class $C_i
 ---
 
 ### 2.2 Comparative Analysis & Justification of Chosen Architecture
-As demonstrated in the evaluation table, **ConvNeXt-Tiny decisively outperforms ResNet-50**, recording an absolute improvement of **+8.88% in Top-1 Accuracy** ($89.53\%$ vs. $80.65\%$) and **+9.25% in Average Accuracy per Class** ($89.36\%$ vs. $80.11\%$).
+The existing production baseline records an absolute improvement of **+8.88% in Top-1 Accuracy** ($89.53\%$ vs. $80.65\%$) and **+9.25% in Average Accuracy per Class** ($89.36\%$ vs. $80.11\%$) for ConvNeXt-Tiny over ResNet-50. The new four-way comparison is pending completion of all 12 isolated runs, so no frozen-versus-fine-tuned winner is claimed here.
 
 Several architectural factors account for this marked performance disparity:
 1. **Multi-Scale Spatial Context:** ConvNeXt's $7\times7$ depthwise convolutions effectively capture long-range spatial dependencies. For bird species classification, distinguishing a *Black-footed Albatross* from a *Laysan Albatross* requires establishing spatial relationships between bill curvature, facial masks, and torso coloration. ResNet-50's localized $3\times3$ convolutions fail to integrate these cues until the very final layers, diluting subtle spatial features.
@@ -98,30 +101,26 @@ Several architectural factors account for this marked performance disparity:
 ---
 
 ### 2.3 Fine-Grained Error Analysis & Confusion Pairs
-Detailed inspection of the test set confusion matrix highlights that misclassifications are concentrated within specific taxonomical families:
+The saved baseline ConvNeXt test evaluation identifies the following directed confusions. These counts are small (at most three errors per directed pair), so they indicate examples for qualitative review rather than broad conclusions about species families:
 
 #### Top Misclassified Species Pairs:
-1. **Laysan Albatross (Class 001) $\leftrightarrow$ Black-footed Albatross (Class 000):** Both species share identical marine habitats, ocean-surface flight angles, and body dimensions. Errors occur when shadow patterns obscure the dark facial plumage of the Black-footed Albatross or when bright ocean glare overexposes the head.
-2. **Glaucous-winged Gull (Class 059) $\leftrightarrow$ Western Gull (Class 064):** Differentiated solely by slight variations in mantle grayness and primary feather tip pigmentation. When photographed from distant perches under overcast skies, color differences compress into identical pixel intensities.
-3. **Cape May Warbler (Class 169) $\leftrightarrow$ Magnolia Warbler (Class 174):** Small passerine birds frequently occluded by pine needles; errors peak when head streaks are partially obscured.
+1. **Common Tern (class 143) predicted as Arctic Tern (class 140):** 3 test errors in this direction.
+2. **Chuck-will's-widow (class 21) predicted as Whip-poor-will (class 104):** 2 errors in this direction; the reverse direction also has 2 errors.
+3. **Acadian Flycatcher (class 36) predicted as Least Flycatcher (class 38):** 2 errors in this direction; the reverse direction also has 2 errors.
 
-#### Qualitative Error Breakdown:
-- **Occlusion & Pose Variance:** Approximately $58\%$ of classification errors involved bird subjects obscured by branches, water reflections, or extreme rear-facing postures where distinctive facial markings were invisible.
-- **Immature Plumage:** Several species exhibit non-breeding or juvenile colorations that closely resemble adult plumage of sister species, challenging even expert ornithologists.
+The evaluation JSON contains predicted labels and aggregate counts, but it does not annotate image occlusion, pose, lighting, or plumage. Therefore, those visual explanations and the earlier estimate that 58% of errors involved occlusion are not claimed here; they would require a separately documented image-level review.
 
 ---
 
 ### 2.4 Overfitting Diagnosis & Mitigation Impact
-Tracking training versus validation metrics confirmed the efficacy of the proposed regularization suite:
-- Without data augmentation and label smoothing, preliminary experiments exhibited severe overconfidence: training accuracy climbed to $99.4\%$ by epoch 6 while validation accuracy stagnated at $61.2\%$ (a generalization gap of $>38\%$).
-- Implementing **RandomResizedCrop**, **ColorJitter**, **Label Smoothing ($\epsilon=0.1$)**, and **AdamW Weight Decay ($\lambda=0.01$)** contracted the generalization gap to $<7\%$, maintaining a steady trajectory in both validation Top-1 and Average Class accuracy.
+The saved fine-tuned histories show that training accuracy continues to exceed validation accuracy. At the final recorded epoch, ResNet-50 reaches 99.42% training Top-1 versus 83.59% validation Top-1 (15.83 percentage points), while ConvNeXt-Tiny reaches 99.61% versus 88.41% (11.20 points). These histories document runs with the regularization configuration described above; they do not include a no-augmentation/no-smoothing ablation, so they cannot establish the causal effect of each regularizer or support an under-7% gap claim. The new frozen-versus-fine-tuned runs will add a regime comparison, not an ablation of individual regularization components.
 
 ---
 
 ## 3. Deployment & Application
 
 ### 3.1 Interactive Gradio Web Application
-The winning **ConvNeXt-Tiny** model was packaged into an interactive **Gradio** web application (`app.py`). Key capabilities include:
+The current baseline checkpoints are packaged into an interactive **Gradio** web application (`app.py`). A new production checkpoint will only be promoted after the completed experiment selects it by validation average class accuracy and its official test evaluation is saved. Key capabilities include:
 - **Real-Time Multi-Modal Input:** Accepts user-uploaded high-resolution bird images, clipboard pastes, and live webcam captures.
 - **Top-5 Predicted Confidence Visualization:** Displays an interactive probability bar chart of the top 5 predicted bird species, mapped to clean, human-readable common names.
 - **Instant Demonstration:** Pre-loaded test image examples enable one-click verification for evaluators without requiring external file preparation.
@@ -130,4 +129,4 @@ The winning **ConvNeXt-Tiny** model was packaged into an interactive **Gradio** 
 ---
 
 ## 4. Conclusion
-Through systematic investigation on the CUB-200 benchmark, this project demonstrated that modern architectural designs (**ConvNeXt-Tiny**) combined with strategic regularization (**Label Smoothing, Cosine Annealing, AdamW, and Random Resized Crops**) overcome the severe fine-grained overfitting vulnerabilities inherent to small bird datasets. The resulting model achieves **89.53% Top-1 Accuracy** and **89.36% Average Class Accuracy**, providing a reliable, production-ready solution deployed interactively via Gradio and Hugging Face Spaces.
+The current production baseline combines modern architectural design (**ConvNeXt-Tiny**) with strategic regularization (**Label Smoothing, Cosine Annealing, AdamW, and Random Resized Crops**) and achieves **89.53% Top-1 Accuracy** and **89.36% Average Class Accuracy**. The frozen-versus-fine-tuned experiment remains pending; its validation-selected checkpoint will be evaluated before any production promotion.

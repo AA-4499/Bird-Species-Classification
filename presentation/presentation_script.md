@@ -64,11 +64,11 @@
 - Table comparing Parameters (24.5M vs. 28.0M) and Receptive Field Dynamics.
 
 **Spoken Script:**
-> *"To explore model design rigorously, I set up a controlled comparative experiment between a canonical baseline and a modern state-of-the-art architecture.
+> *"We compare ResNet-50 and ConvNeXt-Tiny using two training regimes: frozen feature extraction, where only the new classification head learns, and end-to-end fine-tuning. This gives four configurations and lets us compare frozen versus fine-tuned within each architecture, then compare architectures at each regime.
 > 
-> As our baseline, we utilized **ResNet-50**, pre-trained on ImageNet-1K. ResNet's residual connections solve vanishing gradients, but its localized $3\times3$ convolutions have a small effective receptive field early on, which diffuses fine-grained details before the model can correlate distant parts of the bird.
+> Our first architecture is **ResNet-50**, pre-trained on ImageNet-1K. ResNet's residual connections solve vanishing gradients, but its localized $3\times3$ convolutions have a small effective receptive field early on, which diffuses fine-grained details before the model can correlate distant parts of the bird.
 > 
-> For our advanced model, I chose **ConvNeXt-Tiny**. ConvNeXt re-engineers standard CNNs using modern Vision Transformer principles:
+> Our second architecture is **ConvNeXt-Tiny**. ConvNeXt re-engineers standard CNNs using modern Vision Transformer principles:
 > 1. It utilizes **large 7x7 depthwise convolutions**, vastly increasing the receptive field from the very first stage to capture whole-body plumage and bill shapes simultaneously.
 > 2. It implements an **inverted bottleneck design**, expanding hidden channel dimensions by a factor of 4, which prevents spatial detail bottlenecks.
 > 3. It replaces BatchNorm and ReLU with **Layer Normalization and GELU**, stabilizing feature learning across channels.
@@ -121,24 +121,24 @@
 
 ### Slide 6: Experimental Results & Discussion (6:45 - 8:15)
 **Visuals on Slide:**
-- Results Comparison Table:
+- Current production baseline table (the four-way comparison is pending):
   - ResNet-50: 80.65% Top-1 Acc, 80.11% Ave Class Acc.
   - ConvNeXt-Tiny: 89.53% Top-1 Acc, 89.36% Ave Class Acc (+8.88% / +9.25% gain).
 - Training / Validation loss and accuracy curves.
-- Confusion Analysis Callout: Top confused pairs (Laysan Albatross vs. Black-footed Albatross, Glaucous-winged Gull vs. Western Gull).
+- Confusion Analysis Callout: saved ConvNeXt pairs include Common Tern → Arctic Tern, Chuck-will's-widow ↔ Whip-poor-will, and Acadian ↔ Least Flycatcher.
 
 **Spoken Script:**
-> *"Let's examine the experimental results on the official 1,204 test images.
+> *"The current production baseline results on the official 1,204 test images are shown here. The new four-way comparison is still pending completion of twelve isolated runs.
 > In accordance with the assignment guidelines, we evaluated both required metrics:
 > Overall Top-1 Accuracy, and Average Accuracy per Class across all 200 species.
 > 
-> As you can see in the table, **ConvNeXt-Tiny decisively outperformed ResNet-50**.
+> Within the current baseline, **ConvNeXt-Tiny outperformed ResNet-50**.
 > It achieved **89.53% Top-1 Accuracy** compared to ResNet's 80.65% — an absolute improvement of 8.88%.
 > On **Average Accuracy per Class**, ConvNeXt reached **89.36%**, outperforming ResNet's 80.11% by 9.25%.
 > 
-> Looking at the training curves, without our regularization suite, models suffered from severe overfitting where training accuracy reached 99% but validation stalled at 61%. With our augmentations and label smoothing, the generalization gap contracted to under 7%.
+> Our saved fine-tuned histories show a final training-to-validation Top-1 gap of 15.83 points for ResNet-50 and 11.20 points for ConvNeXt-Tiny. We did not save an unregularized ablation, so these runs do not establish how much each regularizer changed the gap.
 > 
-> In our error analysis, the most confused pairs were taxonomically sibling birds, such as the Laysan Albatross versus Black-footed Albatross, where back-lit shadows obscure facial markings, and juvenile gulls whose immature plumage overlaps across species."*
+> The saved ConvNeXt evaluation lists Common Tern predicted as Arctic Tern three times, followed by several pairs with two errors in a direction. The results contain no image annotations explaining those errors, so we do not attribute them to lighting, pose, or plumage."*
 
 ---
 
@@ -166,11 +166,11 @@
 - Bullet points:
   - Successfully addressed FGVC challenges on CUB-200.
   - ConvNeXt-Tiny validated as superior architecture over ResNet-50 (+6% accuracy gain).
-  - Multi-tier regularization suite eliminated severe overfitting.
+  - Multi-tier regularization suite is measured in saved histories; no causal ablation is claimed.
   - Complete deliverables delivered: Modular Python code, 4-page academic report, Gradio app on Hugging Face, and presentation.
 - Contact / GitHub / Hugging Face links.
 
 **Spoken Script:**
-> *"To conclude, this project successfully developed and deployed a robust machine learning system for the CUB-200 fine-grained bird classification challenge. By modernizing our convolutional architecture with ConvNeXt-Tiny and implementing a rigorous regularization suite with label smoothing and random resized crops, we achieved 89.53% Top-1 Accuracy and 89.36% Average Class Accuracy.
+> *"To conclude, this project has a documented production baseline using ConvNeXt-Tiny and a rigorous regularization suite. It achieves 89.53% Top-1 Accuracy and 89.36% Average Class Accuracy. The 12-run frozen-versus-fine-tuned comparison remains pending, and any promotion will be based on validation average class accuracy before official test evaluation.
 > 
 > Thank you very much for your time and attention. All code, checkpoints, and documentation are available in the submission repository and on Hugging Face Spaces."*

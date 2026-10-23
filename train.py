@@ -105,6 +105,8 @@ def main():
     parser = argparse.ArgumentParser(description="Train CUB-200 Bird Classifier")
     parser.add_argument("--model", type=str, default="convnext_tiny", choices=["resnet50", "convnext_tiny"],
                         help="Model architecture to train (resnet50 or convnext_tiny)")
+    parser.add_argument("--mode", choices=["frozen", "fine_tuned"], default="fine_tuned",
+                        help="Train only the new head (frozen) or fine-tune the pretrained backbone")
     parser.add_argument("--epochs", type=int, default=15, help="Number of training epochs")
     parser.add_argument("--batch_size", type=int, default=16, help="Batch size (16 fits comfortably in 4GB VRAM)")
     parser.add_argument("--lr", type=float, default=1e-4, help="Base learning rate for backbone")
@@ -139,13 +141,18 @@ def main():
         model_name=args.model,
         num_classes=200,
         pretrained=True,
-        drop_rate=args.drop_rate
+        drop_rate=args.drop_rate,
+        fine_tune=args.mode == "fine_tuned",
     ).to(device)
 
     # 3. Setup Loss, Optimizer, and LR Scheduler
     # Label smoothing explicitly helps combat overconfident memorization on fine-grained birds
     criterion = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
-    param_groups = get_parameter_groups(model, model_name=args.model, base_lr=args.lr, head_lr_mult=5.0)
+    trainable_params = [param for param in model.parameters() if param.requires_grad]
+    if args.mode == "frozen":
+        param_groups = [{"params": trainable_params, "lr": args.lr * 5.0}]
+    else:
+        param_groups = get_parameter_groups(model, model_name=args.model, base_lr=args.lr, head_lr_mult=5.0)
     optimizer = torch.optim.AdamW(param_groups, weight_decay=args.weight_decay)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs, eta_min=1e-6)
     scaler = GradScaler(enabled=torch.cuda.is_available())
@@ -222,6 +229,7 @@ def main():
             "seed": args.seed,
             "training_config": {
                 "epochs": args.epochs,
+                "mode": args.mode,
                 "batch_size": args.batch_size,
                 "lr": args.lr,
                 "weight_decay": args.weight_decay,

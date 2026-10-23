@@ -125,7 +125,11 @@ architectures with seeds **42, 43, and 44**, for exactly **15 epochs per run**.
 It measures run-to-run variation; it does not isolate the effect of individual
 augmentations, label smoothing, dropout, or optimizer settings.
 
-### Run the six experiments
+### Run the 12 experiments
+
+The four-way comparison is **pending until all 12 jobs finish**: two
+architectures x two training modes x three seeds. The existing production
+checkpoints and the results table below remain the current baseline.
 
 Verify the schedule without starting training:
 
@@ -133,7 +137,7 @@ Verify the schedule without starting training:
 python experiment_runner.py --dry-run
 ```
 
-Run all six training and evaluation jobs:
+Run all 12 training and evaluation jobs:
 
 ```bash
 python experiment_runner.py
@@ -142,11 +146,11 @@ python experiment_runner.py
 Each run is isolated under:
 
 ```text
-experiments/runs/<model>/seed_<seed>/
+experiments/runs/<model>/<mode>/seed_<seed>/
 ├── best_<model>.pth
 ├── latest_<model>.pth
 ├── history_<model>.json
-├── test_metrics_<model>.json
+├── test_metrics_<model>_<mode>.json
 └── run_config.json
 ```
 
@@ -155,15 +159,19 @@ Aggregate metrics and the comparison plot are written to:
 ```text
 experiments/results/multi_seed_summary.json
 experiments/results/multi_seed_comparison.png
+experiments/results/production_selection.json
 ```
 
 The local Streamlit **Experiment** page reads those aggregate artifacts and
-displays each seed's scores, the mean, and standard deviation. Missing
-experiment data is reported without affecting the production Home or Model
-pages. The runner uses dedicated output directories, so it never overwrites
-production checkpoints or `results/` artifacts.
+displays each architecture/mode seed score, mean, and standard deviation. The
+runner selects a production candidate using validation average class accuracy,
+then records the selected checkpoint's official test evaluation in
+`production_selection.json`. The local app only loads that candidate after the
+manifest is complete; otherwise it continues using the current baseline
+checkpoints. Dedicated output directories ensure experiment runs never
+overwrite production checkpoints or `results/` artifacts.
 
-## 📊 Summary of Results
+## 📊 Current Production Baseline (four-way comparison pending)
 
 | Metric | Baseline: ResNet-50 | Advanced: ConvNeXt-Tiny | Relative Improvement |
 | :--- | :---: | :---: | :---: |

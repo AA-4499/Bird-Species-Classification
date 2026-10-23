@@ -20,6 +20,42 @@ if not os.path.exists(CLASS_NAMES_PATH):
     raise FileNotFoundError(f"Required class mapping is missing: {CLASS_NAMES_PATH}")
 class_names = load_class_names(CLASS_NAMES_PATH)
 
+EXPERIMENT_SUMMARY_PATH = "experiments/results/multi_seed_summary.json"
+EXPERIMENT_PLOT_PATH = "experiments/results/multi_seed_comparison.png"
+PRODUCTION_SELECTION_PATH = "experiments/results/production_selection.json"
+
+
+def _load_promoted_config() -> Optional[dict]:
+    """Use an experiment checkpoint only after its official test evaluation exists."""
+    if not os.path.exists(PRODUCTION_SELECTION_PATH):
+        return None
+    try:
+        with open(PRODUCTION_SELECTION_PATH, "r", encoding="utf-8") as manifest_file:
+            manifest = json.load(manifest_file)
+        selected = manifest["selected"]
+        metrics_path = manifest["official_test_metrics"]
+        if manifest.get("status") != "evaluated":
+            return None
+        if not os.path.exists(selected["checkpoint_path"]) or not os.path.exists(metrics_path):
+            return None
+        return {
+            "architecture": selected["model"],
+            "mode": selected["mode"],
+            "checkpoint": selected["checkpoint_path"],
+            "metrics": metrics_path,
+            "curves": os.path.join(
+                os.path.dirname(selected["checkpoint_path"]),
+                f"curves_{selected['model']}.png",
+            ),
+            "histogram": os.path.join(
+                os.path.dirname(selected["checkpoint_path"]),
+                f"class_acc_hist_{selected['model']}_{selected['mode']}.png",
+            ),
+        }
+    except (OSError, KeyError, TypeError, json.JSONDecodeError):
+        return None
+
+
 MODEL_CONFIGS = {
     "ConvNeXt-Tiny": {
         "architecture": "convnext_tiny",
@@ -36,8 +72,9 @@ MODEL_CONFIGS = {
         "histogram": "results/class_acc_hist_resnet50.png",
     },
 }
-EXPERIMENT_SUMMARY_PATH = "experiments/results/multi_seed_summary.json"
-EXPERIMENT_PLOT_PATH = "experiments/results/multi_seed_comparison.png"
+_promoted_config = _load_promoted_config()
+if _promoted_config is not None:
+    MODEL_CONFIGS = {"Production (selected)": _promoted_config, **MODEL_CONFIGS}
 
 EVAL_TRANSFORM = transforms.Compose([
     transforms.Resize((256, 256)),
@@ -72,7 +109,7 @@ def predict_bird(
 ) -> Tuple[Dict[str, float], int, float]:
     """Return the top-five species, top class index, and top confidence."""
     if model is None:
-        model = load_model("ConvNeXt-Tiny")
+        model = load_model("Production (selected)" if "Production (selected)" in MODEL_CONFIGS else "ConvNeXt-Tiny")
     image_tensor = EVAL_TRANSFORM(input_image.convert("RGB")).unsqueeze(0).to(DEVICE)
     with torch.no_grad():
         probabilities = torch.softmax(model(image_tensor), dim=1)[0].cpu().numpy()
@@ -216,10 +253,7 @@ def render_experiment_page() -> None:
         "they do not isolate individual training techniques."
     )
     if not os.path.exists(EXPERIMENT_SUMMARY_PATH):
-        st.info(
-            "Experiment results are not available yet. Run "
-            "`python experiment_runner.py` to create the six runs."
-        )
+        st.info("Experiment results are not available yet. Run `python experiment_runner.py` to create the 12 runs.")
         return
 
     try:
@@ -229,30 +263,39 @@ def render_experiment_page() -> None:
         st.error(f"Could not read experiment results: {error}")
         return
 
-    for model, model_results in summary.get("models", {}).items():
+    for model, model_results in summary.get("architectures", {}).items():
         st.subheader(model.replace("_", " ").title())
-        metric_columns = st.columns(2)
-        top1 = model_results["top1_accuracy_pct"]
-        average_class = model_results["average_accuracy_per_class_pct"]
-        metric_columns[0].metric(
-            "Top-1 accuracy",
-            f"{top1['mean']:.2f}% ± {top1['std']:.2f}%",
-        )
-        metric_columns[1].metric(
-            "Average class accuracy",
-            f"{average_class['mean']:.2f}% ± {average_class['std']:.2f}%",
-        )
-        st.dataframe(
-            [
-                {
-                    "Seed": run["seed"],
-                    "Top-1 accuracy": f"{run['top1_accuracy_pct']:.2f}%",
-                    "Average class accuracy": f"{run['average_accuracy_per_class_pct']:.2f}%",
-                }
-                for run in model_results.get("runs", [])
-            ],
-            hide_index=True,
-            use_container_width=True,
+        for mode, mode_results in model_results.items():
+            st.caption(mode.replace("_", " ").title())
+            metric_columns = st.columns(2)
+            top1 = mode_results["top1_accuracy_pct"]
+            average_class = mode_results["average_accuracy_per_class_pct"]
+            metric_columns[0].metric("Top-1 accuracy", f"{top1['mean']:.2f}% ± {top1['std']:.2f}%")
+            metric_columns[1].metric("Average class accuracy", f"{average_class['mean']:.2f}% ± {average_class['std']:.2f}%")
+            st.dataframe(
+                [
+                    {
+                        "Seed": run["seed"],
+                        "Validation average class accuracy": f"{run['validation_average_class_accuracy'] * 100:.2f}%",
+                        "Top-1 accuracy": f"{run['top1_accuracy_pct']:.2f}%",
+                        "Average class accuracy": f"{run['average_accuracy_per_class_pct']:.2f}%",
+                    }
+                    for run in mode_results.get("runs", [])
+                ],
+                hide_index=True,
+                use_container_width=True,
+            )
+
+    selection_path = os.path.join(os.path.dirname(EXPERIMENT_SUMMARY_PATH), "production_selection.json")
+    if os.path.exists(selection_path):
+        with open(selection_path, "r", encoding="utf-8") as selection_file:
+            selection = json.load(selection_file)
+        chosen = selection.get("selected", {})
+        st.success(
+            f"Selected production configuration: {chosen.get('model')} / "
+            f"{chosen.get('mode')} / seed {chosen.get('seed')} "
+            f"(validation average class accuracy "
+            f"{chosen.get('validation_average_class_accuracy', 0) * 100:.2f}%)."
         )
 
     if os.path.exists(EXPERIMENT_PLOT_PATH):

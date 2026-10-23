@@ -1,0 +1,17 @@
+{
+  "status": "evaluated",
+  "selection_metric": "best validation average class accuracy",
+  "selected": {
+    "seed": 42,
+    "model": "convnext_tiny",
+    "mode": "fine_tuned",
+    "validation_average_class_accuracy": 0.9053333333333333,
+    "top1_accuracy_pct": 89.78,
+    "average_accuracy_per_class_pct": 89.47,
+    "checkpoint_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_42\\best_convnext_tiny.pth",
+    "history_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_42\\history_convnext_tiny.json",
+    "performance_path": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_42\\test_metrics_convnext_tiny_fine_tuned.json"
+  },
+  "official_test_metrics": "experiments\\runs\\convnext_tiny\\fine_tuned\\seed_42\\test_metrics_convnext_tiny_fine_tuned.json",
+  "baseline_preserved": true
+}

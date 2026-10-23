@@ -1,4 +1,8 @@
-# Experimental Results Summary: ResNet-50 vs. ConvNeXt-Tiny
+# Current Production Baseline: ResNet-50 vs. ConvNeXt-Tiny
+
+The four-way frozen-versus-fine-tuned comparison is pending completion of all
+12 isolated runs. These values are preserved from the current production
+checkpoints and are not the new experiment's aggregate results.
 
 | Evaluation Metric | Baseline (ResNet-50) | Advanced (ConvNeXt-Tiny) | Delta Gain |
 | :--- | :---: | :---: | :---: |

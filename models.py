@@ -19,7 +19,8 @@ def build_model(
     model_name: str = "convnext_tiny",
     num_classes: int = 200,
     pretrained: bool = True,
-    drop_rate: float = 0.3
+    drop_rate: float = 0.3,
+    fine_tune: bool = True,
 ) -> nn.Module:
     """
     Construct and initialize the model architecture.
@@ -29,6 +30,8 @@ def build_model(
         num_classes: Number of bird species to predict (200 for CUB-200).
         pretrained: Whether to load ImageNet-1K pretrained weights.
         drop_rate: Dropout probability applied before final linear projection.
+        fine_tune: If false, freeze the pretrained backbone and train only the
+            newly initialized CUB-200 classifier head.
 
     Returns:
         nn.Module: Instantiated PyTorch neural network.
@@ -61,6 +64,17 @@ def build_model(
 
     else:
         raise ValueError(f"Unsupported model architecture: '{model_name}'. Choose 'resnet50' or 'convnext_tiny'.")
+
+    if not fine_tune:
+        for param in model.parameters():
+            param.requires_grad = False
+        if name == "resnet50":
+            head = model.fc
+        else:
+            head = model.head
+        for param in head.parameters():
+            param.requires_grad = True
+        print(f"[INFO] Frozen {name} backbone; training classification head only")
 
     return model
 
