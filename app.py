@@ -197,6 +197,12 @@ def load_metrics(model_label: str) -> Optional[dict]:
     metrics_path = MODEL_CONFIGS[model_label]["metrics"]
     if not os.path.exists(metrics_path):
         return None
+    try:
+        with open(metrics_path, "r", encoding="utf-8") as metrics_file:
+            return json.load(metrics_file)
+    except (OSError, json.JSONDecodeError) as error:
+        st.error(f"Could not read {metrics_path}: {error}")
+        return None
 
 
 @st.cache_data
@@ -370,14 +376,6 @@ def render_experiment_summary(summary: dict) -> None:
                 ),
             },
         )
-    try:
-        with open(metrics_path, "r", encoding="utf-8") as metrics_file:
-            return json.load(metrics_file)
-    except (OSError, json.JSONDecodeError) as error:
-        st.error(f"Could not read {metrics_path}: {error}")
-        return None
-
-
 def render_model_page() -> None:
     """Render saved performance images and evaluation results for each model."""
     st.title("📊 Model Performance")
